@@ -10,18 +10,67 @@ from datetime import datetime
 import base64
 import math
 from .tools.agent import run_agent
+import random
 
 api = Blueprint('api', __name__)
 
 text_blocks = dict()
-
 @api.route('/body', methods=['POST'])
 def body_function():
     data = request.json
 
     text_blocks[data['id']] = {"content": data['text'], "balise": data['balise']}
 
-    return jsonify(run_agent(text_blocks))
+    # Check if input matches function pattern like f(x)=x^2
+    function_pattern = r'^f\(x\)\s*=\s*.+$'
+    if re.match(function_pattern, data['text']):
+        return plot_function(data['text'])
+
+    if (random.randint(0,1)):
+        return body1()
+    return body2()
+    # plt.style.use('dark_background')
+    # fig, ax = plt.subplots(figsize=(10, 6))
+    # x = np.linspace(0,10,1000)
+    # ax.plot(x, x**2, color='#FFD246', linewidth=2)
+    # buf = io.BytesIO()
+    # plt.savefig(buf, format='png', bbox_inches='tight', facecolor='#18192A')
+    # buf.seek(0)
+    # plt.close()
+    
+    # # Convert the image to base64
+    # image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # # return jsonify(run_agent(text_blocks))
+    # return jsonify ({
+    #     'balise': "media_image",
+    #     "text": f'data:image/png;base64,{image_base64}',
+    # })
+    
+def body1():
+    plt.style.use('dark_background')
+    fig, ax = plt.subplots(figsize=(10, 6))
+    x = np.linspace(0,10,1000)
+    ax.plot(x, x**2, color='#FFD246', linewidth=2)
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight', facecolor='#18192A')
+    buf.seek(0)
+    plt.close()
+    
+    # Convert the image to base64
+    image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+    # return jsonify(run_agent(text_blocks))
+    return jsonify ({
+        'balise': "media_image",
+        "text": f'data:image/png;base64,{image_base64}',
+    })
+
+def body2():
+    return jsonify ({
+        'balise': "cours",
+        "text": "Un electron est une particule ...",
+    })
 
 @api.route('/process', methods=['POST'])
 def process_text():
@@ -90,7 +139,6 @@ def plot_function():
             return jsonify({'error': f'Error evaluating function: {str(e)}'}), 400
         
         # Plot the function
-        ax.plot(x, y, color='#FFD246', linewidth=2)
         
         # Add x=0 and y=0 lines
         ax.axhline(y=0, color='skyblue', linestyle='-', linewidth=1, alpha=0.8)
@@ -116,8 +164,12 @@ def plot_function():
         image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
         
         # Return the base64-encoded image
+        # return jsonify({
+        #     'imageData': f'data:image/png;base64,{image_base64}'
+        # })
         return jsonify({
-            'imageData': f'data:image/png;base64,{image_base64}'
+            'balise': 'media_image',
+            'text': f'data:image/png;base64,{image_base64}',
         })
         
     except Exception as e:

@@ -23,8 +23,14 @@ const LatexRenderer: React.FC<LatexRendererProps> = ({ text, displayMode = false
           const math = part.slice(1, -1);
           return <InlineMath key={index} math={math} />;
         } else {
-          // Regular text
-          return <span key={index}>{part}</span>;
+          // Regular text, replace newlines with <br />
+          const lines = part.split(/\n/g);
+          return lines.map((line, i) => (
+            <React.Fragment key={i}>
+              {line}
+              {i !== lines.length - 1 && <br />}
+            </React.Fragment>
+          ));
         }
       })}
     </div>
