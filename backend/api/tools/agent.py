@@ -1,20 +1,27 @@
 
 from smolagents import CodeAgent, LiteLLMModel
 
-
-from context_building import build_context
+from .context_building import build_context
 from smolagents import LiteLLMModel
 
 DEBUG = True
 
-class Agent:
-  fixed_questions:list[dict] = None
-  models:dict = None
+def define_models() -> dict:
+  return None
 
-  def __init__(self, fixed_questions):
-    self.fixed_questions = fixed_questions
+class Agent:
+  fixed_questions: list[dict] = None
+  models: dict = None
+
+  def __init__(self, fixed_questions=None):
+    self.fixed_questions = fixed_questions if fixed_questions is not None else []
     self.models = define_models()
   
+  def update_fixed_questions(self, fixed_questions):
+    """Update the fixed questions for the agent"""
+    self.fixed_questions = fixed_questions
+    print(f"Agent updated with {len(fixed_questions)} fixed questions")
+
   def forward(self, body: list[dict]) -> list[dict]:
     """
     Processes the input body and returns a response based on the agent's logic.
@@ -28,6 +35,23 @@ class Agent:
     # Here you would implement the logic to process the body and generate a response
     translated_body = translate_json(body)
     anthropified_body = anthropify_body(translated_body)
+    
+    # Add fixed questions to the beginning of the context if they exist
+    if self.fixed_questions:
+      # Add fixed questions as initial context
+      fixed_context = []
+      for fq in self.fixed_questions:
+        # Add the question as assistant message
+        fixed_context.append({"role": "assistant", "content": fq["question"]})
+        # Add the answer as user message
+        fixed_context.append({"role": "user", "content": fq["answer"]})
+      
+      # Prepend fixed questions to the conversation
+      anthropified_body = fixed_context + anthropified_body
+      
+      if DEBUG:
+        print("Added fixed questions to context:", len(self.fixed_questions))
+    
     if DEBUG:
       print("Anthropified body:", anthropified_body)
     context = build_context(anthropified_body)
@@ -49,7 +73,9 @@ class Agent:
 agent = Agent()
 
 def init_agent(fixed_questions: list[dict]):
-  agent.__init__(fixed_questions)
+  """Initialize the agent with fixed questions from the questionnaire"""
+  agent.update_fixed_questions(fixed_questions)
+  print(f"Agent initialized with {len(fixed_questions)} fixed questions")
 
 def run_agent(body: list[dict]) -> list[dict]:
    return agent.forward(body)

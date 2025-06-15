@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const placeholderImages = [
   'https://media.licdn.com/dms/image/v2/D4E03AQHgM8-b6YnEWA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1720511882437?e=1755129600&v=beta&t=PORD_vegfkC7MhFf6qu2hSmz5xmEyRjZO_IwqBNEwZY',
@@ -12,14 +12,42 @@ const placeholderImages = [
   'https://media.licdn.com/dms/image/v2/D4E03AQHgM8-b6YnEWA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1720511882437?e=1755129600&v=beta&t=PORD_vegfkC7MhFf6qu2hSmz5xmEyRjZO_IwqBNEwZY',
 ];
 
-const initialTextBlocks = [
-  'Welcome to the Page block! This is a sample text block.',
-  'You can add multiple text blocks here, each with its own content and style.',
-  'The right area will soon display media in a scrollable column.'
-];
+interface PageContainerProps {
+  userName?: string;
+  selectedSubjects?: any[];
+  selectedTopics?: string[];
+}
 
-const PageContainer: React.FC = () => {
-  const [textBlocks, setTextBlocks] = useState(initialTextBlocks);
+const PageContainer: React.FC<PageContainerProps> = ({ 
+  userName = 'Student', 
+  selectedSubjects = [], 
+  selectedTopics = [] 
+}) => {
+  const [textBlocks, setTextBlocks] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Generate welcome message from agent
+    const generateWelcomeMessage = () => {
+      let topics = '';
+      
+      if (selectedTopics && selectedTopics.length > 0) {
+        // Use specific topics if available
+        topics = selectedTopics.map(topic => topic.split(' (')[0]).join(', ');
+      } else if (selectedSubjects && selectedSubjects.length > 0) {
+        // Use subject names if no specific topics
+        topics = selectedSubjects.map(subject => subject.name?.replace(/[🧮⚛️🧪🧬💻⏳🌍💹🧠📚🇺🇸🇪🇸🇫🇷🌐]/g, '').trim()).join(', ');
+      } else {
+        topics = 'various academic topics';
+      }
+
+      const welcomeMessage = `Hello ${userName}! 👋 Welcome to our learning session. I'm your AI tutor, and I'm excited to help you learn and grow. Let's talk about ${topics} and explore these subjects together. Feel free to ask me anything - I'm here to guide you through your learning journey!`;
+      
+      return [welcomeMessage];
+    };
+
+    const initialMessages = generateWelcomeMessage();
+    setTextBlocks(initialMessages);
+  }, [userName, selectedSubjects, selectedTopics]);
 
   return (
     <div style={{
@@ -43,7 +71,7 @@ const PageContainer: React.FC = () => {
         flexDirection: 'column',
         gap: '16px',
       }}>
-        <h2 style={{ margin: 0, color: '#e27100', fontSize: '52px', fontWeight: 700, textAlign: 'center' }}>Text</h2>
+        <h2 style={{ margin: 0, color: '#e27100', fontSize: '52px', fontWeight: 700, textAlign: 'center' }}>AI Tutor</h2>
         <div style={{
           width: '100%',
           height: '3px',

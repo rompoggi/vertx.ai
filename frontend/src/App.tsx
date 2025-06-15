@@ -11,6 +11,7 @@ import Logo from './components/Logo.tsx';
 import Stepper, { Step } from './components/Stepper.tsx';
 import AnimatedList from './components/AnimatedList.tsx';
 import PageContainer from './components/PageContainer.tsx';
+import DuolingoProgressBar from './components/DuolingoProgressBar.tsx';
 
 
 const App: React.FC = () => {
@@ -26,6 +27,7 @@ const App: React.FC = () => {
   const [selectedEducationLevel, setSelectedEducationLevel] = useState<{item: string, index: number} | null>(null);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [isQuestionnaireCompleted, setIsQuestionnaireCompleted] = useState(false);
 
   // Initialize questionnaire data from backend
   const initializeQuestionnaire = async () => {
@@ -239,6 +241,7 @@ const App: React.FC = () => {
       if (response.data.success) {
         console.log('Questionnaire submitted successfully:', response.data);
         console.log('Selected subjects with topics:', response.data.selected_subjects_with_topics);
+        setIsQuestionnaireCompleted(true);
       }
     } catch (err) {
       setError('Error submitting questionnaire. Please try again.');
@@ -370,6 +373,14 @@ const App: React.FC = () => {
             opacity: 0.7,
             margin: '32px 0',
             borderRadius: '1px',
+          }}
+        />
+
+        {/* Duolingo Progress Bar */}
+        <DuolingoProgressBar 
+          initialProgress={0}
+          onProgressChange={(progress) => {
+            console.log(`🎯 Progress updated: ${progress}%`);
           }}
         />
 
@@ -591,7 +602,11 @@ const App: React.FC = () => {
         </div>
 
         <div id="page-container">
-          <PageContainer></PageContainer>
+          <PageContainer 
+            userName={name}
+            selectedSubjects={selectedSubjects}
+            selectedTopics={selectedTopics}
+          />
         </div>
       </div>
     </>
