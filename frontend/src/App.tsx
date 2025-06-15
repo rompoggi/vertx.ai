@@ -242,6 +242,17 @@ const App: React.FC = () => {
         console.log('Questionnaire submitted successfully:', response.data);
         console.log('Selected subjects with topics:', response.data.selected_subjects_with_topics);
         setIsQuestionnaireCompleted(true);
+        
+        // Scroll to progress bar after questionnaire completion
+        setTimeout(() => {
+          const progressBarSection = document.getElementById('progress-bar-section');
+          if (progressBarSection) {
+            progressBarSection.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }
+        }, 500);
       }
     } catch (err) {
       setError('Error submitting questionnaire. Please try again.');
@@ -373,14 +384,6 @@ const App: React.FC = () => {
             opacity: 0.7,
             margin: '32px 0',
             borderRadius: '1px',
-          }}
-        />
-
-        {/* Duolingo Progress Bar */}
-        <DuolingoProgressBar 
-          initialProgress={0}
-          onProgressChange={(progress) => {
-            console.log(`🎯 Progress updated: ${progress}%`);
           }}
         />
 
@@ -599,6 +602,17 @@ const App: React.FC = () => {
               />
             </Step>
           </Stepper>
+        </div>
+
+{/* Duolingo Progress Bar */}
+        <div id="progress-bar-section">
+          <DuolingoProgressBar 
+            initialProgress={0}
+            startDemo={isQuestionnaireCompleted}
+            onProgressChange={(progress) => {
+              console.log(`🎯 Progress updated: ${progress}%`);
+            }}
+          />
         </div>
 
         <div id="page-container">

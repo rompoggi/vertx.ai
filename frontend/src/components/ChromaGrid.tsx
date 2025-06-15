@@ -277,7 +277,7 @@ export const ChromaGrid: React.FC<ChromaGridProps> = ({
     url: "https://github.com/sarahjohnson"
   },
   {
-    image: "https://media.licdn.com/dms/image/v2/D4E03AQFlM1DI9DyU5g/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1701048880965?e=1755129600&v=beta&t=97OyYIICLLJPVuCa2IBhHviAimXxx2eBFHMbg2jkn7o",
+    image: "https://media.licdn.com/dms/image/v2/D4E03AQGogY0h_hDZEA/profile-displayphoto-crop_800_800/B4EZdvwHV3GcAI-/0/1749926573991?e=1755734400&v=beta&t=oKsmvPJau6lLtvDBQ4LhmOCFNtQNyfhUcRuJ-gfPXbA",
     title: "Octave Gaspard",
     subtitle: "Student",
     handle: "@octavegaspard",
@@ -325,7 +325,7 @@ const orangeGrid: ChromaItem[] = [
     url: "https://www.linkedin.com/in/romain-poggi-95696323a/"
   },
   {
-    image: "https://media.licdn.com/dms/image/v2/D4E03AQFlM1DI9DyU5g/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1701048880965?e=1755129600&v=beta&t=97OyYIICLLJPVuCa2IBhHviAimXxx2eBFHMbg2jkn7o",
+    image: "https://media.licdn.com/dms/image/v2/D4E03AQGogY0h_hDZEA/profile-displayphoto-crop_800_800/B4EZdvwHV3GcAI-/0/1749926573991?e=1755734400&v=beta&t=oKsmvPJau6lLtvDBQ4LhmOCFNtQNyfhUcRuJ-gfPXbA",
     title: "Octave Gaspard",
     subtitle: "Student",
     handle: "@octavegaspard",

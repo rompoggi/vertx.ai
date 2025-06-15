@@ -219,7 +219,7 @@ const duolingoProgressBarStyles = `
   max-width: 600px;
   margin: 0 auto 2rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg,rgba(255, 227, 67, 0.5) 0%, rgba(206, 140, 0, 0.5) 100%);
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   position: relative;
@@ -248,7 +248,7 @@ const duolingoProgressBarStyles = `
 
 .duolingo-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #FFD700 0%, #FFA500 50%, #FF6B6B 100%);
+  background: linear-gradient(90deg, #FFA500 0%, #FFD246 50%, #FFB347 100%);
   border-radius: 25px;
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -286,7 +286,7 @@ const duolingoProgressBarStyles = `
 }
 
 .duolingo-checkpoint.completed {
-  background: #FFD700;
+  background: #FFD246;
   border-color: #FFA500;
   transform: translate(-50%, -50%) scale(1.1);
   animation: checkpointPulse 0.6s ease-out;
@@ -323,14 +323,14 @@ const duolingoProgressBarStyles = `
 }
 
 .duolingo-btn-primary {
-  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  background: linear-gradient(135deg, #FFA500 0%, #FFD246 100%);
   color: white;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3);
 }
 
 .duolingo-btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 6px 20px rgba(255, 165, 0, 0.4);
 }
 
 .duolingo-btn-primary:disabled {

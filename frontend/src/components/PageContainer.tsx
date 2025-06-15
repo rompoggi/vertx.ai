@@ -22,7 +22,7 @@ const pageContainerStyles = `
     padding: 32px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 12px;
     overflow-y: auto;
   }
 
@@ -93,15 +93,15 @@ const pageContainerStyles = `
 
   .text-input {
     background: #ffe6b3;
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 8px;
+    padding: 12px;
     color: #222;
-    font-size: 2rem;
+    font-size: 1.4rem;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-weight: 700;
+    font-weight: 600;
     border: none;
     width: 100%;
-    min-height: 48px;
+    min-height: 36px;
     margin-bottom: 0;
     resize: none;
     box-sizing: border-box;
@@ -111,25 +111,25 @@ const pageContainerStyles = `
 
   .text-display {
     background: #ffe6b3;
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 8px;
+    padding: 12px;
     color: #222;
-    font-size: 2rem;
+    font-size: 1.4rem;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
-    min-height: 48px;
+    min-height: 36px;
     box-shadow: 0 2px 8px rgba(226,113,0,0.04);
   }
 
   .add-block-button {
-    margin-top: 18px;
-    padding: 10px 28px;
-    font-size: 2rem;
+    margin-top: 12px;
+    padding: 8px 20px;
+    font-size: 1.4rem;
     background: linear-gradient(90deg, #e27100 0%, #ffd246 100%);
     color: #222;
     border: none;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
     box-shadow: 0 2px 12px rgba(226,113,0,0.12);
@@ -158,12 +158,6 @@ const pageContainerStyles = `
   }
 `
 
-const initialTextBlocks = [
-  'Welcome to the Page block! This is a sample text block.',
-  'You can add multiple text blocks here, each with its own content and style.',
-  'The right area will soon display media in a scrollable column.'
-];
-
 // Each block will have { text, mode } where mode is 'edit' or 'render'
 interface TextBlock {
   id: string;
@@ -172,23 +166,86 @@ interface TextBlock {
   balise?: string;
 }
 
+interface PageContainerProps {
+  userName?: string;
+  selectedSubjects?: any[];
+  selectedTopics?: string[];
+}
+
 const generateUniqueId = () => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
 
-const initialBlockObjects: TextBlock[] = initialTextBlocks.map(text => ({ 
-  id: generateUniqueId(),
-  text, 
-  mode: 'edit' 
-}));
-
-const PageContainer: React.FC = () => {
-  const [textBlocks, setTextBlocks] = useState<TextBlock[]>(initialBlockObjects);
+const PageContainer: React.FC<PageContainerProps> = ({ 
+  userName = 'Utilisateur', 
+  selectedSubjects = [], 
+  selectedTopics = [] 
+}) => {
+  const [textBlocks, setTextBlocks] = useState<TextBlock[]>([]);
   const [mediaImages, setMediaImages] = useState<string[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
   const textAreaRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const textAreaContainerRef = useRef<HTMLDivElement>(null);
 
-  // Add new text block from API
+  // Initialize and update text blocks when props change
+  useEffect(() => {
+    const createWelcomeMessage = () => {
+      const subjectsText = selectedSubjects.length > 0 
+        ? selectedSubjects.map(s => s.name).join(', ')
+        : 'various fascinating subjects';
+      
+      const topicsText = selectedTopics.length > 0
+        ? selectedTopics.slice(0, 3).join(', ') + (selectedTopics.length > 3 ? '...' : '')
+        : 'general exploration';
+
+      return `🎯 Welcome ${userName}! 
+
+I'm delighted to welcome you to this collaborative learning space. We'll explore together ${subjectsText}, with a particular focus on ${topicsText}.
+
+This environment allows you to:
+- ✍️ Ask questions and interact with content
+- 📚 Generate personalized explanations 
+- 🖼️ Create visual resources in the media area
+- 🔄 Modify and enrich content in real-time
+
+**To get started:** Click on this block to edit it, or add new blocks with the button below. Use Shift+Enter to save your changes!`;
+    };
+
+    if (!isInitialized) {
+      // First initialization
+      const initialBlockObjects: TextBlock[] = [
+        { 
+          id: generateUniqueId(),
+          text: createWelcomeMessage(), 
+          mode: 'render' 
+        },
+        ...['You can add text blocks, ask questions, and explore different topics.', 
+            'The media area on the right will display generated visual resources.'].map(text => ({ 
+          id: generateUniqueId(),
+          text, 
+          mode: 'edit' as const
+        }))
+      ];
+      setTextBlocks(initialBlockObjects);
+      setIsInitialized(true);
+    } else {
+      // Update only the welcome message (first block) when props change
+      setTextBlocks(prevBlocks => {
+        if (prevBlocks.length > 0) {
+          return [
+            {
+              ...prevBlocks[0],
+              text: createWelcomeMessage()
+            },
+            ...prevBlocks.slice(1)
+          ];
+        }
+        return prevBlocks;
+      });
+    }
+  }, [userName, selectedSubjects, selectedTopics, isInitialized]);
+
+    // Add new text block from API
   const addTextBlockFromAPI = (text: string, balise: string) => {
     setTextBlocks(prevBlocks => [...prevBlocks, { 
       id: generateUniqueId(),
@@ -266,7 +323,7 @@ const PageContainer: React.FC = () => {
     <div className="page-container">
       {/* Left: Text Area */}
       <div className="text-area" ref={textAreaContainerRef}>
-        <h2 className="title">Text</h2>
+        <h2 className="title">AI Assistant</h2>
         <div className="divider" />
         {textBlocks.map((block, idx) => (
           <div key={block.id} className="text-block-container">
