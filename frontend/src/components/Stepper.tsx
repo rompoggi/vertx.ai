@@ -36,10 +36,13 @@ const stepperStyles = `
     margin-right: auto;
     width: 100%;
     max-width: 48rem;
+    height: 700px; /* Fixed height instead of min-height */
     background: rgba(0, 0, 0, 0.65);
     border-radius: 2rem; /* Uniform border radius for all corners */
     box-shadow: 0px 0px 6px 6px rgba(184, 129, 1, 0.10),
         0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
 }
 
 .step-indicator-row {
@@ -52,22 +55,37 @@ const stepperStyles = `
 .step-content-default {
     position: relative;
     overflow: hidden;
+    flex: 1; /* Take remaining space above footer */
+    display: flex;
+    flex-direction: column;
 }
 
 .step-default {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding: 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    overflow: visible;
 }
 
 .footer-container {
-    padding-left: 2rem;
-    padding-right: 2rem;
-    padding-bottom: 2rem;
+    height: 100px; /* Fixed height */
+    padding: 0 2rem; /* Remove top/bottom padding */
+    border-top: 1px solid rgba(255, 210, 70, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 0 0 2rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Spread buttons to opposite sides */
 }
 
 .footer-nav {
-    margin-top: 2.5rem;
+    margin: 0;
     display: flex;
+    align-items: center;
+    width: 100%; /* Take full width */
+    justify-content: space-between; /* Always spread buttons */
 }
 
 .footer-nav.spread {
@@ -78,47 +96,112 @@ const stepperStyles = `
     justify-content: flex-end;
 }
 
+.footer-nav.end {
+    justify-content: flex-end;
+}
+
 .back-button {
-    transition: all 350ms;
-    border-radius: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    color: #e27100;
+    transition: all 300ms ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(115, 63, 16, 0.8);
+    border: 2px solid rgba(255, 210, 70, 0.3);
+    color: #fffac2;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.025em;
+    padding: 12px 24px;
     cursor: pointer;
-    background: rgba(255, 240, 224, 0.85);
+    min-width: 100px;
+    position: relative;
+    overflow: hidden;
+}
+
+.back-button:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 210, 70, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.back-button:hover:before {
+    left: 100%;
 }
 
 .back-button:hover {
-    color: #fff;
-    background: #e27100;
+    background: rgba(115, 63, 16, 1);
+    border-color: rgba(255, 210, 70, 0.6);
+    color: #ffd246;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(226, 113, 0, 0.3);
+}
+
+.back-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(226, 113, 0, 0.2);
 }
 
 .back-button.inactive {
     pointer-events: none;
     opacity: 0.5;
-    color: #e27100;
+    color: #733f10;
+    background: rgba(115, 63, 16, 0.3);
+    border-color: rgba(255, 210, 70, 0.1);
+    cursor: not-allowed;
 }
 
 .next-button {
-    transition: all 350ms;
+    transition: all 300ms ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 9999px;
-    background-color: rgba(226, 113, 0, 0.85);
-    color: #fff;
-    font-weight: 500;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #e27100 0%, #ffd246 100%);
+    border: none;
+    color: #1a1000;
+    font-weight: 700;
+    font-size: 14px;
     letter-spacing: -0.025em;
-    padding: 0.375rem 0.875rem;
+    padding: 12px 28px;
     cursor: pointer;
+    min-width: 120px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(226, 113, 0, 0.4);
+}
+
+.next-button:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.next-button:hover:before {
+    left: 100%;
 }
 
 .next-button:hover {
-    background-color: #ffd246;
-    color: #1a1000;
+    background: linear-gradient(135deg, #ffd246 0%, #ffed4e 100%);
+    color: #2d1600;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(226, 113, 0, 0.5);
+}
 }
 
 .next-button:active {
-    background-color: #e27100;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(226, 113, 0, 0.3);
 }
 
 .step-indicator {
@@ -299,15 +382,17 @@ const stepperStyles = `
   
           {!isCompleted && (
             <div className={`footer-container ${footerClassName}`}>
-              <div className={`footer-nav ${currentStep !== 1 ? "spread" : "end"}`}>
-                {currentStep !== 1 && (
+              <div className="footer-nav">
+                {currentStep !== 1 ? (
                   <button
                     onClick={handleBack}
-                    className={`back-button ${currentStep === 1 ? "inactive" : ""}`}
+                    className="back-button"
                     {...backButtonProps}
                   >
                     {backButtonText}
                   </button>
+                ) : (
+                  <div></div> /* Empty div to maintain space on left when no Previous button */
                 )}
                 <button
                   onClick={isLastStep ? handleComplete : handleNext}
@@ -506,4 +591,5 @@ const stepperStyles = `
       </svg>
     );
   }
+  
   
