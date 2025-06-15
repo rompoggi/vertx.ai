@@ -101,8 +101,8 @@ const Header: React.FC = () => {
         <div className="status">
           <span className="status-dot" /> Up &amp; Running
         </div>
-        <a className="menu-link" href="#docs">Docs</a>
-        <a className="menu-link" href="#signin">Sign In</a>
+        <a className="menu-link" href="#docs">GitHub</a>
+        <a className="menu-link" href="#signin">Demo</a>
         <button className="get-started-btn">Get Started</button>
       </nav>
     </header>

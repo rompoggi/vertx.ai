@@ -2,6 +2,7 @@ import React, {
   useRef,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
   MouseEventHandler,
   UIEvent,
@@ -12,10 +13,11 @@ const animateListStyles = `
 .scroll-list-container {
   position: relative;
   width: 500px;
+  max-width: 100%;
 }
 
 .scroll-list {
-  max-height: 400px;
+  max-height: 300px; /* Reduced height to fit within stepper */
   overflow-y: auto;
   padding: 16px;
 }
@@ -120,13 +122,15 @@ const AnimatedItem: React.FC<AnimatedItemProps> = ({
 interface AnimatedListProps {
   items?: string[];
   onItemSelect?: (item: string, index: number) => void;
+  onMultiSelect?: (items: string[], indices: number[]) => void;
   showGradients?: boolean;
   enableArrowNavigation?: boolean;
   className?: string;
   itemClassName?: string;
   displayScrollbar?: boolean;
   initialSelectedIndex?: number;
-  allowHtml?: boolean; // New prop to enable HTML rendering
+  allowHtml?: boolean;
+  multiSelect?: boolean; // New prop to enable multi-selection
 }
 
 const AnimatedList: React.FC<AnimatedListProps> = ({
@@ -139,6 +143,7 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
     "Item 6"
   ],
   onItemSelect,
+  onMultiSelect,
   showGradients = false,
   enableArrowNavigation = true,
   className = "",
@@ -146,10 +151,11 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
   displayScrollbar = true,
   initialSelectedIndex = -1,
   allowHtml = false,
+  multiSelect = false,
 }) => {
   const listRef = useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] =
-    useState<number>(initialSelectedIndex);
+  const [selectedIndex, setSelectedIndex] = useState<number>(initialSelectedIndex);
+  const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const [keyboardNav, setKeyboardNav] = useState<boolean>(false);
   const [topGradientOpacity, setTopGradientOpacity] = useState<number>(0);
   const [bottomGradientOpacity, setBottomGradientOpacity] = useState<number>(1);
@@ -166,6 +172,40 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
 
   useEffect(() => {
     if (!enableArrowNavigation) return;
+    
+    // Handle item selection logic
+    const handleItemSelection = (index: number, ctrlKey: boolean = false) => {
+      if (multiSelect) {
+        setSelectedIndices(prev => {
+          let newSelectedIndices = [...prev];
+          
+          if (ctrlKey) {
+            // Toggle selection with Ctrl/Cmd
+            if (newSelectedIndices.includes(index)) {
+              newSelectedIndices = newSelectedIndices.filter(i => i !== index);
+            } else {
+              newSelectedIndices.push(index);
+            }
+          } else {
+            // Single selection or replace all
+            newSelectedIndices = [index];
+          }
+          
+          if (onMultiSelect) {
+            const selectedItems = newSelectedIndices.map(i => items[i]);
+            onMultiSelect(selectedItems, newSelectedIndices);
+          }
+          
+          return newSelectedIndices;
+        });
+      } else {
+        // Single selection mode
+        setSelectedIndex(index);
+        if (onItemSelect) {
+          onItemSelect(items[index], index);
+        }
+      }
+    };
     
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only handle arrow keys if no input is focused
@@ -194,19 +234,46 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
           if (prev === -1) return items.length - 1;
           return Math.max(prev - 1, 0);
         });
-      } else if (e.key === "Enter") {
+      } else if (e.key === "Enter" || e.key === " ") {
         if (selectedIndex >= 0 && selectedIndex < items.length) {
           e.preventDefault();
-          if (onItemSelect) {
-            onItemSelect(items[selectedIndex], selectedIndex);
-          }
+          handleItemSelection(selectedIndex, e.ctrlKey || e.metaKey);
         }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [items, selectedIndex, onItemSelect, enableArrowNavigation]);
+  }, [items, selectedIndex, selectedIndices, onItemSelect, onMultiSelect, enableArrowNavigation, multiSelect]);
+
+  // Handle item selection logic for click events
+  const handleClickSelection = (index: number, ctrlKey: boolean = false) => {
+    if (multiSelect) {
+      setSelectedIndices(prev => {
+        let newSelectedIndices = [...prev];
+        
+        // In multi-select mode, always toggle selection (no need for Ctrl)
+        if (newSelectedIndices.includes(index)) {
+          newSelectedIndices = newSelectedIndices.filter(i => i !== index);
+        } else {
+          newSelectedIndices.push(index);
+        }
+        
+        if (onMultiSelect) {
+          const selectedItems = newSelectedIndices.map(i => items[i]);
+          onMultiSelect(selectedItems, newSelectedIndices);
+        }
+        
+        return newSelectedIndices;
+      });      } else {
+        // Single selection mode - only allow one item to be selected at a time
+        // Always select the clicked item (no toggle behavior for single select)
+        setSelectedIndex(index);
+        if (onItemSelect) {
+          onItemSelect(items[index], index);
+        }
+      }
+  };
 
   useEffect(() => {
     if (!keyboardNav || selectedIndex < 0 || !listRef.current) return;
@@ -252,21 +319,31 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
           }
         }}
       >
-        {items.map((item, index) => (
+        {items.map((item, index) => {
+          const isSelected = multiSelect 
+            ? selectedIndices.includes(index) 
+            : selectedIndex === index;
+            
+          return (
           <AnimatedItem
             key={index}
             delay={0.1}
             index={index}
-            onMouseEnter={() => setSelectedIndex(index)}
-            onClick={() => {
-              setSelectedIndex(index);
-              if (onItemSelect) {
-                onItemSelect(item, index);
+            onMouseEnter={() => {
+              // Only update hover selection in single-select mode if no item is currently selected
+              if (!multiSelect && selectedIndex === -1) {
+                setSelectedIndex(index);
               }
+            }}
+            onClick={(e) => {
+              // For multi-select, always toggle on click (no Ctrl needed)
+              // For single-select, still respect Ctrl for potential future features
+              const ctrlKey = multiSelect ? false : (e.ctrlKey || e.metaKey);
+              handleClickSelection(index, ctrlKey);
             }}
           >
             <div
-              className={`item ${selectedIndex === index ? "selected" : ""} ${itemClassName}`}
+              className={`item ${isSelected ? "selected" : ""} ${itemClassName}`}
             >
               {allowHtml ? (
                 <p 
@@ -278,7 +355,8 @@ const AnimatedList: React.FC<AnimatedListProps> = ({
               )}
             </div>
           </AnimatedItem>
-        ))}
+          );
+        })}
       </div>
       {showGradients && (
         <>
