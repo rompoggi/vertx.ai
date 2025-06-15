@@ -62,8 +62,8 @@ class Agent:
     # Context is user/assistant alternating messages
   
     # Define answer by LLMlite
-    # with open("./api_key.txt", "r") as f:
-    #     key = f.read().strip()
+    with open("./api_key.txt", "r") as f:
+        key = f.read().strip()
     model = LiteLLMModel(model_id="claude-3-5-haiku-latest", temperature=0.3, max_tokens=300, api_key=key)
 
     answer = model.generate(context)
