@@ -54,7 +54,7 @@ const chromaGridStyles = `
   flex-direction: column;
   width: 320px;
   height: 100%;
-  min-height: 500px;
+  max-height: 500px;
   border-radius: 20px;
   overflow: hidden;
   border: 1px solid #333;
@@ -322,7 +322,7 @@ const orangeGrid: ChromaItem[] = [
     handle: "@rompoggi",
     borderColor: "#3B82F6",
     gradient: "linear-gradient(145deg, #FFE585, #000)",
-    url: "https://github.com/sarahjohnson"
+    url: "https://www.linkedin.com/in/romain-poggi-95696323a/"
   },
   {
     image: "https://media.licdn.com/dms/image/v2/D4E03AQFlM1DI9DyU5g/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1701048880965?e=1755129600&v=beta&t=97OyYIICLLJPVuCa2IBhHviAimXxx2eBFHMbg2jkn7o",
@@ -331,7 +331,7 @@ const orangeGrid: ChromaItem[] = [
     handle: "@octavegaspard",
     borderColor: "#10B981",
     gradient: "linear-gradient(210deg, #FFD246, #000)",
-    url: "https://linkedin.com/in/mikechen"
+    url: "https://www.linkedin.com/in/octave-g-b47b93264/"
   },
   {
     image: "https://media.licdn.com/dms/image/v2/C4E03AQHBP-RcilWHyQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1644261388068?e=1755129600&v=beta&t=yUh1nlajPhTOHdEz5PSxUFtgJ2-w_V48TKuFfwgA4iI",
@@ -340,7 +340,7 @@ const orangeGrid: ChromaItem[] = [
     handle: "@thomas-turkieh",
     borderColor: "#10B981",
     gradient: "linear-gradient(165deg, #FFBC1B, #000)",
-    url: "https://linkedin.com/in/mikechen"
+    url: "https://www.linkedin.com/in/thomas-turkieh-09a273231/"
   },
   {
     image: "https://minio.binets.fr/sigma-prod/pictures/users/vianney.gauthier?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=sigma-prod%2F20250613%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250613T204148Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=47164d516f59234c50859beae7b5d00da2d2baabcf881cd732773b2fa18ae87a",
@@ -349,7 +349,7 @@ const orangeGrid: ChromaItem[] = [
     handle: "@vianney-gauthier",
     borderColor: "#10B981",
     gradient: "linear-gradient(195deg, #FC9700, #000)",
-    url: "https://linkedin.com/in/mikechen"
+    url: "https://www.linkedin.com/in/vianney-gauthier-42b308334/"
   },
   {
     image: "https://media.licdn.com/dms/image/v2/D4E03AQGUTwMLs-47BQ/profile-displayphoto-shrink_800_800/B4EZa6zHZ5HwAg-/0/1746890684558?e=1755129600&v=beta&t=M3x-9JWmLN5uFN1T-VQeS6TvT43huC5Jb_c8Prd-gSU",
@@ -358,7 +358,7 @@ const orangeGrid: ChromaItem[] = [
     handle: "@andrea-signoretti",
     borderColor: "#10B981",
     gradient: "linear-gradient(225deg, #E27100, #000)",
-    url: "https://linkedin.com/in/mikechen"
+    url: "https://www.linkedin.com/in/andrea-signoretti-a17093230/"
   }
   ];
 
