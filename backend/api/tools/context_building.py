@@ -23,7 +23,9 @@ Consider whether the user seems confused, is making progress but still unsure, h
 
 Your response should consist of two parts: a short summary stating the user’s global state, and a brief explanation that justifies your assessment based on the provided context. Be concise, objective, and grounded in the interaction.
 
-You should NOT answer the questions asked by the user, you should just analyze the interaction and provide an assessment of the user's state."""
+You should NOT answer the questions asked by the user, you should just analyze the interaction and provide an assessment of the user's state.
+
+Do NOT ask questions to the User. Answer by saying "the user..." instead of "you...". You are talking to another ChatBot, not to the user. This model needs to have information from you. You cannot ask questions at all. If you don't know how to provide analysis, say so and stop generating."""
 
 def build_context(body: list[dict]) -> list[dict]:
     """
