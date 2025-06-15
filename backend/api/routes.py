@@ -9,8 +9,19 @@ import os
 from datetime import datetime
 import base64
 import math
+from tools.agent import run_agent
 
 api = Blueprint('api', __name__)
+
+text_blocks = dict()
+
+@api.route('/body', methods=['POST'])
+def body_function():
+    data = request.json
+
+    text_blocks[data['id']] = {"content": data['text'], "balise": data['balise']}
+
+    return jsonify(run_agent(text_blocks))
 
 @api.route('/process', methods=['POST'])
 def process_text():

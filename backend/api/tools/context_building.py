@@ -47,7 +47,6 @@ def user_state_estimator(body: list[dict]) -> ChatMessage:
     model = LiteLLMModel(model_id="claude-3-5-haiku-latest", temperature=0.3, max_tokens=300, api_key=key)
     add_prompt = body
     add_prompt[-1]["content"] = last_content_prompted(body)
-    print("add_prompt", add_prompt)
     return model.generate(add_prompt)
 
 def last_content_prompted(body):
