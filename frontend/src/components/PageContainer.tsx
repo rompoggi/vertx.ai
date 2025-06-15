@@ -8,10 +8,10 @@ const pageContainerStyles = `
     width: 80vw;
     height: 90vh;
     margin: 40px auto;
-    border: 1px solid #ffd246;
     border-radius: 2rem;
     background: rgba(0, 0, 0, 0.65);
-    box-shadow: 0px 0px 6px 6px rgba(184, 129, 1, 0.10) 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow: 0px 0px 8px 8px rgba(184, 129, 1, 0.10),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
     overflow: hidden;
   }
 
@@ -219,8 +219,7 @@ This environment allows you to:
           text: createWelcomeMessage(), 
           mode: 'render' 
         },
-        ...['You can add text blocks, ask questions, and explore different topics.', 
-            'The media area on the right will display generated visual resources.'].map(text => ({ 
+        ...[].map(text => ({ 
           id: generateUniqueId(),
           text, 
           mode: 'edit' as const

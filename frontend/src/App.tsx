@@ -80,7 +80,7 @@ const App: React.FC = () => {
           {"id": "geography", "name": "Geography 🌍", "topics": ["Physical Geography", "Human Geography", "Geopolitics"]},
           {"id": "economics", "name": "Economics 💹", "topics": ["Microeconomics", "Macroeconomics", "Personal Finance"]},
           {"id": "psychology", "name": "Psychology 🧠", "topics": ["Cognitive", "Social", "Developmental"]},
-          {"id": "literature", "name": "Literature �", "topics": ["American Literature", "World Literature", "Poetry"]},
+          {"id": "literature", "name": "Literature 📚", "topics": ["American Literature", "World Literature", "Poetry"]},
           {"id": "english", "name": "English 🇺🇸", "topics": ["Grammar", "Writing", "Literature"]},
           {"id": "spanish", "name": "Spanish 🇪🇸", "topics": ["Conversation", "Grammar", "Culture"]},
           {"id": "french", "name": "French 🇫🇷", "topics": ["Conversation", "Grammar", "Culture"]},
@@ -322,47 +322,61 @@ const App: React.FC = () => {
           </SpotlightCard>
         </div>
         </div>
-        <div style={{ 
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '0 0 100px 0',
-          textAlign: 'center', 
-          color: '#fff', 
-          fontSize: '1.2rem' }}>
-          <strong>What is vortx.ai?</strong>
-          <br />
-          vortx.ai is an AI-powered assistant platform designed to help you connect your cloud, get help from the internet, and complete your tasks efficiently. Our mission is to streamline your workflow with intelligent automation and seamless integration.
-            <button
-            style={{
-              marginTop: '32px',
-              padding: '12px 32px',
-              fontSize: '1.1rem',
-              background: 'linear-gradient(90deg, #e27100 0%, #ffd246 100%)',
-              color: '#222',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 600,
-              boxShadow: '0 2px 12px rgba(226,113,0,0.12)'
-            }}
-            onClick={() => {
-              const divider = document.getElementById('stepper-section');
-              if (divider) {
-              const rect = divider.getBoundingClientRect();
-              // Scroll so the divider is at the very top of the viewport
-              window.scrollTo({
-                top: rect.top - 64,
-                behavior: 'smooth'
-              });
-              }
-            }}
-            >
-            Launch Demo
-            </button>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            maxWidth: '900px',
+            margin: '0 auto',
+            padding: '16px 0 32px 0',
+            textAlign: 'center',
+            color: '#fff',
+            fontSize: '1.6rem',
+            letterSpacing: '0.01em',
+            lineHeight: 1.5,
+          }}
+        >
+          <div style={{
+            fontWeight: 900,
+            fontSize: '2.5rem',
+            color: '#e27100',
+            marginBottom: '10px',
+            letterSpacing: '0.03em',
+            textShadow: '0 2px 12px rgba(226,113,0,0.10)'
+          }}>
+            vortx.ai
+          </div>
+          <div style={{
+            fontWeight: 600,
+            fontSize: '1.5rem',
+            color: '#fff',
+            marginBottom: '18px'
+          }}>
+            Your intelligent assistant for learning and productivity.
+          </div>
+          <div style={{
+            fontSize: '1.2rem',
+            color: '#ffd246',
+            margin: '0 0 18px 0',
+            fontWeight: 500,
+            letterSpacing: '0.01em'
+          }}>
+            <span style={{ color: '#e27100', fontSize: '1.5rem', verticalAlign: 'middle' }}>•</span> Connect your cloud and favorite tools.<br />
+            <span style={{ color: '#e27100', fontSize: '1.5rem', verticalAlign: 'middle' }}>•</span> Get instant answers, visualizations, and smart suggestions.<br />
+            <span style={{ color: '#e27100', fontSize: '1.5rem', verticalAlign: 'middle' }}>•</span> Streamline your workflow with automation and seamless integration.
+          </div>
+          <div style={{
+            margin: '18px 0 0 0',
+            fontWeight: 700,
+            fontSize: '1.3rem',
+            color: '#ffd246',
+            letterSpacing: '0.01em',
+            textShadow: '0 2px 8px rgba(255,210,70,0.10)'
+          }}>
+            Unlock your potential with <span style={{ color: '#e27100' }}>adaptive AI</span> — all in one place.
+          </div>
         </div>
         
         <div style={{ height: '600px', position: 'relative' }}>
@@ -608,7 +622,6 @@ const App: React.FC = () => {
         <div id="progress-bar-section">
           <DuolingoProgressBar 
             initialProgress={0}
-            startDemo={isQuestionnaireCompleted}
             onProgressChange={(progress) => {
               console.log(`🎯 Progress updated: ${progress}%`);
             }}
@@ -628,81 +641,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-          
-          {/* <GraphRenderer /> */}
-{/*           
-          <div style={{ 
-            maxWidth: '3000px',
-            width: '100%',
-            margin: '0 auto',
-            position: 'relative',
-            zIndex: 1
-          }}> 
-          </div>
-        </div>
-      </body>
-    </>
-  );
-};
-
-export default App;
-          onItemSelect={(item, index) => {
-            console.log('Selected subject:', item, 'at index:', index);
-          }}
-          ></AnimatedList>   
-
-          <div
-            style={{
-              width: '100%',
-              height: '2px',
-              background: 'linear-gradient(60deg, #e27100 20%, #ffd246 100%)',
-              opacity: 0.7,
-              margin: '32px 0',
-              borderRadius: '1px',
-            }}
-          />
-        </div>
-            </Step>
-            <Step>
-              <h2>How about an input?</h2>
-              <input 
-                type="text"
-                value={name} 
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} 
-                placeholder="Your name?" 
-              />
-            </Step>
-            <Step>
-              <h2>Final Step</h2>
-              <p>You made it!</p>
-            </Step>
-          </Stepper>
-          
-        </div> */}
-
-        <PageContainer></PageContainer>
-{/* 
-          <ApiWorkflow
-            inputText={inputText}
-            setInputText={setInputText}
-            processedText={processedText}
-            processText={processText}
-            error={error}
-          /> */}
-          
-          {/* <GraphRenderer /> */}
-{/*           
-          <div style={{ 
-            maxWidth: '3000px',
-            width: '100%',
-            margin: '0 auto',
-            position: 'relative',
-            zIndex: 1
-          }}> 
-          </div>
-        </div>
-      </body>
-    </>
-  );
-};
-export default App; */}

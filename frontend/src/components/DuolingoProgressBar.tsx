@@ -219,9 +219,10 @@ const duolingoProgressBarStyles = `
   max-width: 600px;
   margin: 0 auto 2rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg,rgba(255, 227, 67, 0.5) 0%, rgba(206, 140, 0, 0.5) 100%);
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border-radius: 2rem;
+  background: rgba(0, 0, 0, 0.65);
+  box-shadow: 0px 0px 6px 6px rgba(184, 129, 1, 0.10),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
   position: relative;
   z-index: 10;
 }
