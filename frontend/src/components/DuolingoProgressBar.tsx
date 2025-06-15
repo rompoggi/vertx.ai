@@ -4,11 +4,15 @@ import { Socket } from 'socket.io-client';
 interface DuolingoProgressBarProps {
   initialProgress?: number;
   onProgressChange?: (progress: number) => void;
+  enableAutoDemo?: boolean;
+  startDemo?: boolean;
 }
 
 const DuolingoProgressBar: React.FC<DuolingoProgressBarProps> = ({ 
   initialProgress = 0, 
-  onProgressChange 
+  onProgressChange,
+  enableAutoDemo = true,
+  startDemo = false
 }) => {
   const [progress, setProgress] = useState(initialProgress);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -127,37 +131,48 @@ const DuolingoProgressBar: React.FC<DuolingoProgressBarProps> = ({
     // Load canvas-confetti dynamically
     loadConfetti();
 
+    // Auto demo: progress 10% every 2 seconds, but only if startDemo is true
+    let demoInterval: NodeJS.Timeout;
+    if (enableAutoDemo && startDemo) {
+      demoInterval = setInterval(() => {
+        setProgress(prev => {
+          const newProgress = Math.min(prev + 10, 100);
+          
+          // Trigger animations and callbacks
+          setIsAnimating(true);
+          setTimeout(() => setIsAnimating(false), 600);
+          
+          // Check for checkpoint rewards
+          const currentCheckpoint = checkpoints.findIndex(cp => newProgress >= cp && prev < cp);
+          if (currentCheckpoint !== -1) {
+            setLastCheckpoint(checkpoints[currentCheckpoint]);
+            triggerCheckpointAnimation(checkpoints[currentCheckpoint]);
+          }
+          
+          // Call parent callback
+          if (onProgressChange) {
+            onProgressChange(newProgress);
+          }
+          
+          // Stop interval when reaching 100%
+          if (newProgress >= 100) {
+            clearInterval(demoInterval);
+          }
+          
+          return newProgress;
+        });
+      }, 2000);
+    }
+
     return () => {
       if (wsRef.current) {
         wsRef.current.close();
       }
+      if (demoInterval) {
+        clearInterval(demoInterval);
+      }
     };
-  }, [connectWebSocket, loadConfetti]);
-
-  const simulateCorrectAnswer = () => {
-    if (wsRef.current && wsRef.current.connected) {
-      // Send answer to backend for evaluation
-      const answerData = {
-        type: 'answer_submission',
-        answer: 'correct_answer_simulation',
-        timestamp: Date.now()
-      };
-      wsRef.current.emit('answer_submission', answerData);
-    } else {
-      // Fallback: simulate progress locally
-      updateProgress(Math.min(progress + 10, 100));
-    }
-  };
-
-  const resetProgress = () => {
-    setProgress(0);
-    setLastCheckpoint(-1);
-    setIsAnimating(false);
-    
-    if (wsRef.current && wsRef.current.connected) {
-      wsRef.current.emit('reset_progress', {});
-    }
-  };
+  }, [connectWebSocket, loadConfetti, enableAutoDemo, startDemo, checkpoints, onProgressChange, triggerCheckpointAnimation]);
 
   return (
     <>
@@ -190,23 +205,6 @@ const DuolingoProgressBar: React.FC<DuolingoProgressBarProps> = ({
           <div className="duolingo-progress-text">
             {progress}% Complete
           </div>
-        </div>
-
-        {/* Control Buttons */}
-        <div className="duolingo-controls">
-          <button 
-            className="duolingo-btn duolingo-btn-primary"
-            onClick={simulateCorrectAnswer}
-            disabled={progress >= 100}
-          >
-            ✅ Simulate Correct Answer (+10%)
-          </button>
-          <button 
-            className="duolingo-btn duolingo-btn-secondary"
-            onClick={resetProgress}
-          >
-            🔄 Reset Progress
-          </button>
         </div>
       </div>
     </>
@@ -405,16 +403,6 @@ const duolingoProgressBarStyles = `
   .duolingo-progress-container {
     margin: 0 auto 1rem;
     padding: 1rem;
-  }
-  
-  .duolingo-controls {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .duolingo-btn {
-    width: 100%;
-    max-width: 280px;
   }
   
   .duolingo-checkpoint {

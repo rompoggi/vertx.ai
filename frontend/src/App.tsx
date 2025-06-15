@@ -12,6 +12,7 @@ import Stepper, { Step } from './components/Stepper.tsx';
 import AnimatedList from './components/AnimatedList.tsx';
 import PageContainer from './components/PageContainer.tsx';
 import DuolingoProgressBar from './components/DuolingoProgressBar.tsx';
+import TalentTree from './components/TalentTree.tsx';
 
 
 const App: React.FC = () => {
@@ -635,9 +636,130 @@ const App: React.FC = () => {
             selectedTopics={selectedTopics}
           />
         </div>
+
+        {/* Talent Tree Section */}
+        <div id="talent-tree-section" style={{
+          width: '100%',
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '40px 20px',
+          marginTop: '60px'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '40px',
+            zIndex: 5,
+            position: 'relative'
+          }}>
+            <h2 style={{
+              fontSize: '2.5rem',
+              fontWeight: 'bold',
+              marginBottom: '1rem',
+              background: 'linear-gradient(135deg, #e27100 0%, #ffd246 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              lineHeight: 1.2,
+            }}>
+              🌟 Arbre de Compétences
+            </h2>
+            <p style={{
+              fontSize: '1.2rem',
+              color: '#ffd246',
+              opacity: 0.9,
+              maxWidth: '600px',
+              margin: '0 auto',
+              lineHeight: 1.6,
+            }}>
+              Explorez les matières et développez vos compétences de manière interactive
+            </p>
+          </div>
+          <TalentTree />
+        </div>
       </div>
     </>
   );
 };
 
 export default App;
+          
+          {/* <GraphRenderer /> */}
+{/*           
+          <div style={{ 
+            maxWidth: '3000px',
+            width: '100%',
+            margin: '0 auto',
+            position: 'relative',
+            zIndex: 1
+          }}> 
+          </div>
+        </div>
+      </body>
+    </>
+  );
+};
+
+export default App;
+          onItemSelect={(item, index) => {
+            console.log('Selected subject:', item, 'at index:', index);
+          }}
+          ></AnimatedList>   
+
+          <div
+            style={{
+              width: '100%',
+              height: '2px',
+              background: 'linear-gradient(60deg, #e27100 20%, #ffd246 100%)',
+              opacity: 0.7,
+              margin: '32px 0',
+              borderRadius: '1px',
+            }}
+          />
+        </div>
+            </Step>
+            <Step>
+              <h2>How about an input?</h2>
+              <input 
+                type="text"
+                value={name} 
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} 
+                placeholder="Your name?" 
+              />
+            </Step>
+            <Step>
+              <h2>Final Step</h2>
+              <p>You made it!</p>
+            </Step>
+          </Stepper>
+          
+        </div> */}
+
+        <PageContainer></PageContainer>
+{/* 
+          <ApiWorkflow
+            inputText={inputText}
+            setInputText={setInputText}
+            processedText={processedText}
+            processText={processText}
+            error={error}
+          /> */}
+          
+          {/* <GraphRenderer /> */}
+{/*           
+          <div style={{ 
+            maxWidth: '3000px',
+            width: '100%',
+            margin: '0 auto',
+            position: 'relative',
+            zIndex: 1
+          }}> 
+          </div>
+        </div>
+      </body>
+    </>
+  );
+};
+export default App; */}
