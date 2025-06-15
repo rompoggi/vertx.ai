@@ -55,6 +55,10 @@
     ]
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@tailwindcss/postcss": "^4.1.10",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^4.1.10"
   }
 }
