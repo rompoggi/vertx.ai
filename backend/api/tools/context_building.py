@@ -44,7 +44,6 @@ def user_state_estimator(body: list[dict]) -> ChatMessage:
     # load api_key from ./api_key.txt
     # with open("./api_key.txt", "r") as f:
     #     key = f.read().strip()
-    key="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"
     model = LiteLLMModel(model_id="claude-3-5-haiku-latest", temperature=0.3, max_tokens=300, api_key=key)
     add_prompt = body
     add_prompt[-1]["content"] = last_content_prompted(body)
