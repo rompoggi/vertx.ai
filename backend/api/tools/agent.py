@@ -1,4 +1,7 @@
 
+from smolagents import CodeAgent, LiteLLMModel
+
+
 
 class Agent:
   fixed_questions:list[dict] = None
@@ -26,3 +29,42 @@ class Agent:
 
 def define_models() -> dict:
   return
+
+def question_agent (context : str) -> str:
+  """
+  determines if enough inital questions have been asked to start the conversation, if not, it will ask the user a question
+  """
+  api_key = open(r"backend\api\tools\storage\api_key.txt", "r", encoding="utf-8").read()
+  model = LiteLLMModel(
+    model_id="anthropic/claude-opus-4-20250514",
+    temperature=1,
+    api_key= api_key# in practice we would not hardcode the API key, but use an environment variable or a secure vault service
+  )
+  
+  prompt = """
+Role: You're a tutor AI determining if enough context has been gathered to begin teaching.  
+Rules:  
+1. Analyze ONLY the conversation history below  
+2. If essential teaching context is present (subject, level, etc..):  
+   - Output EXACTLY: `%Question_end%`  
+   - Do not be strict, but ensure the context is sufficient to start teaching
+3. If a CRITICAL and ESSENTIAL information is missing:  
+   - Output ONE question to gather the MOST URGENT missing information  
+   - Phrase it as a SINGLE question only (no prefixes/suffixes)  
+
+Conversation History CONSIDER THE FOLLOWING ONLY, IMPORTANT:  
+{history}  
+
+Output Instructions:  
+- ONLY `%Question_end%` or ONE question  
+- NO explanations, NO markdown, NO apologies  
+- Example valid outputs:  
+    -`%Question_end%`  
+    -`What specific topic in algebra do you need help with?`  
+    -`Are you preparing for an exam or just general practice?`  
+"""
+  prompt = str(prompt.format(history = context))
+  return model(
+     messages = [{"role": "user", "content": prompt}],
+      max_tokens=1000
+  ).content
