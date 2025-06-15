@@ -1,0 +1,47 @@
+body {
+  margin: 0;
+  padding: 0;
+  /* /* min-height: 100vh; */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  background:
+    /* Subtle grid pattern, lines every 64px to match DotGrid */
+    repeating-linear-gradient(0deg, rgba(229, 26, 26, 0.02) 0px, rgba(203, 28, 28, 0.02) 1px, transparent 1px, transparent 108px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 108px),
+    /* Main gradient */
+    linear-gradient(320deg, #2d1600 0%, #1a0e00 100%);
+  z-index: 0;
+  color: #fff;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(circle at 80% 10%, rgba(255, 210, 70, 0.10) 0, transparent 60%);
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(circle at 10% 90%, rgba(255, 210, 70, 0.10) 0, transparent 60%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+} 

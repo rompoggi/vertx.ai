@@ -299,3 +299,7 @@ TSWLatexianTemp*
 # option is specified. Footnotes are the stored in a file with suffix Notes.bib.
 # Uncomment the next line to have this generated file ignored.
 #*Notes.bib
+*.pyc
+/frontend/node_modules
+frontend/src/.DS_Store
+frontend/package-lock.json
