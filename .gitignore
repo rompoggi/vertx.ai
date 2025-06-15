@@ -308,3 +308,4 @@ backend/env
 backend/venv
 backend/source
 backend/api/tools/storage/api_key.txt
+backend/api/tools/api_key.txt
