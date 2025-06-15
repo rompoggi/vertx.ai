@@ -55,7 +55,17 @@ def run_agent(body: list[dict]) -> list[dict]:
    return agent.forward(body)
 
 def define_models() -> dict:
-  return
+  models = dict()
+  with open("./api_key.txt", "r") as f:
+    api_key = f.read().strip()
+  
+  models["course"] = CodeAgent(model=LiteLLMModel(model_id="claude-3-5-haiku-latest", api_key=api_key, temperature=0.2, max_tokens=2000), name="course_agent", description="This Agent is responsible for explaining large concepts to the user. If the user seems stuck on some specific content, the course_agent would be interesting to use to explain the user the concept he is lacking.  It is also used to answer the user's questions about the course, such as 'What is a Markov Chain?' or 'What is Young's double-slit experiment?'. The course_agent is also used to explain the course step by step, and to answer the user's questions about the course.")
+
+  models["question"] = CodeAgent(model=LiteLLMModel(model_id="claude-3-5-haiku-latest", api_key=api_key, temperature=0.2, max_tokens=1000), name="question_agent", description="This Agent is responsible for asking questions to the user to verify the users understanding of the course. When the user seems to have understood the course, the question_agent will ask questions to verify the user's understanding. If the user seems to be stuck on some specific content, the question_agent will ask questions to help the user understand the concept he is lacking. The question_agent is also used to ask questions about the user's understanding of the course, such as 'Do you feel like you completely understand what a Markov Chain is?' or 'Do you know the principle behind Young's double-slit experiment?'.")
+
+  models["manager"] = CodeAgent(model=LiteLLMModel(model_id="claude-3-5-haiku-latest", api_key=api_key, temperature=0.1, max_tokens=1000), managed_agents=[models["course"], models["question"]], name="manager_agent", description="This Agent is responsible for managing the conversation between the user and the course_agent and question_agent. It decides which agent to use based on the user's input and the context of the conversation. The manager_agent can also choose not to do anything if it believes it wouldn't help the user, or the user did not write enough to warrant an answer.")
+
+  return models
 
 def question_agent (context : str) -> str:
   """
