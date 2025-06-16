@@ -11,6 +11,8 @@ import Logo from './components/Logo.tsx';
 import Stepper, { Step } from './components/Stepper.tsx';
 import AnimatedList from './components/AnimatedList.tsx';
 import PageContainer from './components/PageContainer.tsx';
+import DuolingoProgressBar from './components/DuolingoProgressBar.tsx';
+import TalentTree from './components/TalentTree.tsx';
 
 
 const App: React.FC = () => {
@@ -26,6 +28,7 @@ const App: React.FC = () => {
   const [selectedEducationLevel, setSelectedEducationLevel] = useState<{item: string, index: number} | null>(null);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [isQuestionnaireCompleted, setIsQuestionnaireCompleted] = useState(false);
 
   // Initialize questionnaire data from backend
   const initializeQuestionnaire = async () => {
@@ -78,7 +81,7 @@ const App: React.FC = () => {
           {"id": "geography", "name": "Geography 🌍", "topics": ["Physical Geography", "Human Geography", "Geopolitics"]},
           {"id": "economics", "name": "Economics 💹", "topics": ["Microeconomics", "Macroeconomics", "Personal Finance"]},
           {"id": "psychology", "name": "Psychology 🧠", "topics": ["Cognitive", "Social", "Developmental"]},
-          {"id": "literature", "name": "Literature �", "topics": ["American Literature", "World Literature", "Poetry"]},
+          {"id": "literature", "name": "Literature 📚", "topics": ["American Literature", "World Literature", "Poetry"]},
           {"id": "english", "name": "English 🇺🇸", "topics": ["Grammar", "Writing", "Literature"]},
           {"id": "spanish", "name": "Spanish 🇪🇸", "topics": ["Conversation", "Grammar", "Culture"]},
           {"id": "french", "name": "French 🇫🇷", "topics": ["Conversation", "Grammar", "Culture"]},
@@ -239,6 +242,18 @@ const App: React.FC = () => {
       if (response.data.success) {
         console.log('Questionnaire submitted successfully:', response.data);
         console.log('Selected subjects with topics:', response.data.selected_subjects_with_topics);
+        setIsQuestionnaireCompleted(true);
+        
+        // Scroll to progress bar after questionnaire completion
+        setTimeout(() => {
+          const progressBarSection = document.getElementById('progress-bar-section');
+          if (progressBarSection) {
+            progressBarSection.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }
+        }, 500);
       }
     } catch (err) {
       setError('Error submitting questionnaire. Please try again.');
@@ -308,47 +323,61 @@ const App: React.FC = () => {
           </SpotlightCard>
         </div>
         </div>
-        <div style={{ 
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          maxWidth: '800px',
-          margin: '0 auto',
-          padding: '0 0 100px 0',
-          textAlign: 'center', 
-          color: '#fff', 
-          fontSize: '1.2rem' }}>
-          <strong>What is vortx.ai?</strong>
-          <br />
-          vortx.ai is an AI-powered assistant platform designed to help you connect your cloud, get help from the internet, and complete your tasks efficiently. Our mission is to streamline your workflow with intelligent automation and seamless integration.
-            <button
-            style={{
-              marginTop: '32px',
-              padding: '12px 32px',
-              fontSize: '1.1rem',
-              background: 'linear-gradient(90deg, #e27100 0%, #ffd246 100%)',
-              color: '#222',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 600,
-              boxShadow: '0 2px 12px rgba(226,113,0,0.12)'
-            }}
-            onClick={() => {
-              const divider = document.getElementById('stepper-section');
-              if (divider) {
-              const rect = divider.getBoundingClientRect();
-              // Scroll so the divider is at the very top of the viewport
-              window.scrollTo({
-                top: rect.top - 64,
-                behavior: 'smooth'
-              });
-              }
-            }}
-            >
-            Launch Demo
-            </button>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            maxWidth: '900px',
+            margin: '0 auto',
+            padding: '16px 0 32px 0',
+            textAlign: 'center',
+            color: '#fff',
+            fontSize: '1.6rem',
+            letterSpacing: '0.01em',
+            lineHeight: 1.5,
+          }}
+        >
+          <div style={{
+            fontWeight: 900,
+            fontSize: '2.5rem',
+            color: '#e27100',
+            marginBottom: '10px',
+            letterSpacing: '0.03em',
+            textShadow: '0 2px 12px rgba(226,113,0,0.10)'
+          }}>
+            vortx.ai
+          </div>
+          <div style={{
+            fontWeight: 600,
+            fontSize: '1.5rem',
+            color: '#fff',
+            marginBottom: '18px'
+          }}>
+            Your intelligent assistant for learning and productivity.
+          </div>
+          <div style={{
+            fontSize: '1.2rem',
+            color: '#ffd246',
+            margin: '0 0 18px 0',
+            fontWeight: 500,
+            letterSpacing: '0.01em'
+          }}>
+            <span style={{ color: '#e27100', fontSize: '1.5rem', verticalAlign: 'middle' }}>•</span> Connect your cloud and favorite tools.<br />
+            <span style={{ color: '#e27100', fontSize: '1.5rem', verticalAlign: 'middle' }}>•</span> Get instant answers, visualizations, and smart suggestions.<br />
+            <span style={{ color: '#e27100', fontSize: '1.5rem', verticalAlign: 'middle' }}>•</span> Streamline your workflow with automation and seamless integration.
+          </div>
+          <div style={{
+            margin: '18px 0 0 0',
+            fontWeight: 700,
+            fontSize: '1.3rem',
+            color: '#ffd246',
+            letterSpacing: '0.01em',
+            textShadow: '0 2px 8px rgba(255,210,70,0.10)'
+          }}>
+            Unlock your potential with <span style={{ color: '#e27100' }}>adaptive AI</span> — all in one place.
+          </div>
         </div>
         
         <div style={{ height: '600px', position: 'relative' }}>
@@ -590,8 +619,65 @@ const App: React.FC = () => {
           </Stepper>
         </div>
 
+{/* Duolingo Progress Bar */}
+        <div id="progress-bar-section">
+          <DuolingoProgressBar 
+            initialProgress={0}
+            onProgressChange={(progress) => {
+              console.log(`🎯 Progress updated: ${progress}%`);
+            }}
+          />
+        </div>
+
         <div id="page-container">
-          <PageContainer></PageContainer>
+          <PageContainer 
+            userName={name}
+            selectedSubjects={selectedSubjects}
+            selectedTopics={selectedTopics}
+          />
+        </div>
+
+        {/* Talent Tree Section */}
+        <div id="talent-tree-section" style={{
+          width: '100%',
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '40px 20px',
+          marginTop: '60px'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '40px',
+            zIndex: 5,
+            position: 'relative'
+          }}>
+            <h2 style={{
+              fontSize: '2.5rem',
+              fontWeight: 'bold',
+              marginBottom: '1rem',
+              background: 'linear-gradient(135deg, #e27100 0%, #ffd246 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              lineHeight: 1.2,
+            }}>
+              🌟 Arbre de Compétences
+            </h2>
+            <p style={{
+              fontSize: '1.2rem',
+              color: '#ffd246',
+              opacity: 0.9,
+              maxWidth: '600px',
+              margin: '0 auto',
+              lineHeight: 1.6,
+            }}>
+              Explorez les matières et développez vos compétences de manière interactive
+            </p>
+          </div>
+          <TalentTree />
         </div>
       </div>
     </>

@@ -14,6 +14,7 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "axios": "^1.6.0",
+    "canvas-confetti": "^1.9.3",
     "framer-motion": "^12.18.1",
     "gsap": "^3.12.5",
     "katex": "^0.16.22",
@@ -24,10 +25,12 @@
     "react-icons": "^5.5.0",
     "react-katex": "^3.1.0",
     "react-scripts": "^5.0.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "start": "PORT=3001 react-scripts start",
+    "start": "PORT=3000 react-scripts start",
     "start:all": "concurrently \"cd ../backend && python3 -m venv env && source env/bin/activate && pip install -r requirements.txt && python3 app.py\" \"npm start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -52,6 +55,10 @@
     ]
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@tailwindcss/postcss": "^4.1.10",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^4.1.10"
   }
 }

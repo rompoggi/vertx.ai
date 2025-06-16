@@ -2,6 +2,7 @@ import React, { ReactNode } from "react";
 
 const gradientTextStyles = `
 .animated-gradient-text {
+  height: 80px;
   position: relative;
   margin: 0 auto;
   display: flex;
@@ -68,6 +69,7 @@ const gradientTextStyles = `
   -webkit-background-clip: text;
   color: transparent;
   animation: gradient linear infinite;
+  fontSize: 2em;
 }
 `
 
@@ -82,12 +84,13 @@ interface GradientTextProps {
 export default function GradientText({
   children,
   className = "",
-  colors = ["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"],
+  colors = ["#fff287", "#ce8c00", "#E27100"],
   animationSpeed = 8,
   showBorder = false,
 }: GradientTextProps) {
   const gradientStyle = {
     backgroundImage: `linear-gradient(to right, ${colors.join(", ")})`,
+    fontSize: `1.5em`,
     animationDuration: `${animationSpeed}s`,
   };
 
