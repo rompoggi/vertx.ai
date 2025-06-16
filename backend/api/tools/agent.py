@@ -17,6 +17,19 @@ class Agent:
     define_models(self)
 
   def forward(self, body: list[dict]) -> list[dict]:
+     # if "[%QE%]" is somewhere in the body, forward to manager, otherwise forward to question
+     if len(body) == 0:
+       return [{"balise": None, "text": None}]
+     if any("[%QE%]" in message["text"] for message in body):
+        return self.forward_manager(body)
+     else:
+        return self.forward_question(body)
+  
+  def forward_question(self, body: list[dict]) -> list[dict]:
+     question_returned = question_agent.run(body[0]["text"])
+     return [{"balise": "question", "text": question_returned.content}]
+
+  def forward_manager(self, body: list[dict]) -> list[dict]:
     """
     Processes the input body and returns a response based on the agent's logic.
 
@@ -56,7 +69,7 @@ class Agent:
     manager = self.models["manager"]
     prompt_manager = self.models["context_to_prompt"].generate(context).content
     
-    answer = manager.run(prompt_manager + "\n\n### SYSTEM PROMPT ###\n Your  task is to analyze the context and decide which agent to use. If you think the user needs help with the course, ask course_agent to give you a paragraph about a specific topic you will ask it about, and return it. If you think it would be good for the user to confirm their knowledge, ask question_agent to ask a question about the course. Return an answer after a single tool use, so that your returned answer is of the form '{\"balise\": agent_used_type (cours or question), \"text\": content_to_return}' ")
+    answer = manager.run(prompt_manager + "\n\n### SYSTEM PROMPT ###\n Your  task is to analyze the context and decide which agent to use. If you think the user needs help with the course, ask course_agent to give you a paragraph about a specific topic you will ask it about, and return it. If you think it would be good for the user to confirm their knowledge, ask question_agent to ask a question about the course. Return an answer after a single tool use, so that your returned answer is of the form '{\"balise\": agent_used_type (cours or question), \"text\": content_to_return}'. If you don't want to return anything since the answers you are do not meet your quality standards, you may decide to return nothing, in this case, use the \"nothing\" balise. If an agent returns an answer you deem unwanted or unnecessary, or it does not meet your quality standards, you may decide to try again, ask another agent or, and it should sometimes be preferred, return nothing.")
     print(answer)
     # Returns a {"text":..., "balise":...}
     return answer
@@ -79,9 +92,9 @@ def define_models(agent) -> dict:
 
   models["context_to_prompt"] = LiteLLMModel(model_id="claude-3-5-haiku-latest", api_key=api_key, temperature=0.2, max_tokens=5000)
   
-  models["course"] = CodeAgent(model=LiteLLMModel(model_id="claude-sonnet-4-20250514", api_key=api_key, temperature=0.2, max_tokens=2000), name="course_agent", description="This Agent is responsible for explaining large concepts to the user. If the user seems stuck on some specific content, the course_agent would be interesting to use to explain the user the concept he is lacking.  It is also used to answer the user's questions about the course, such as 'What is a Markov Chain?' or 'What is Young's double-slit experiment?'. The course_agent is also used to explain the course step by step, and to answer the user's questions about the course.", tools=[WebSearchTool()], max_steps=3)
+  models["course"] = CodeAgent(model=LiteLLMModel(model_id="claude-sonnet-4-20250514", api_key=api_key, temperature=0.2, max_tokens=2000), name="course_agent", description="This Agent is responsible for explaining large concepts to the user. If the user seems stuck on some specific content, the course_agent would be interesting to use to explain the user the concept he is lacking.  It is also used to answer the user's questions about the course, such as 'What is a Markov Chain?' or 'What is Young's double-slit experiment?'. The course_agent is also used to explain the course step by step, and to answer the user's questions about the course.\n### PROMPTING METHOD ###\nAsk the course agent to NOT complain, NOT ask for more information on its task, NOT answer as a chatbot. The course agent SHOULD answer a paragraph about a SINGLE topic. It should only use web search if it cannot come up with any course content by itself or make sure he is right about a complex point. It can think about a full course but should only teach about ONE SINGLE point of the course, likely as a single paragraph; as you may decide to ask the agent for the follow-up paragraphs later.", tools=[WebSearchTool()], max_steps=3)
 
-  models["question"] = CodeAgent(model=LiteLLMModel(model_id="claude-sonnet-4-20250514", api_key=api_key, temperature=0.2, max_tokens=2000), name="question_agent", description="This Agent is responsible for asking questions to the user to verify the users understanding of the course. When the user seems to have understood the course, the question_agent will ask questions to verify the user's understanding. If the user seems to be stuck on some specific content, the question_agent will ask questions to help the user understand the concept he is lacking. The question_agent is also used to ask questions about the user's understanding of the course, such as 'Do you feel like you completely understand what a Markov Chain is?' or 'Do you know the principle behind Young's double-slit experiment?'.", tools=[WebSearchTool()], max_steps=3)
+  models["question"] = CodeAgent(model=LiteLLMModel(model_id="claude-sonnet-4-20250514", api_key=api_key, temperature=0.2, max_tokens=2000), name="question_agent", description="This Agent is responsible for asking questions to the user to verify the users understanding of the course. When the user seems to have understood the course, the question_agent will ask questions to verify the user's understanding. If the user seems to be stuck on some specific content, the question_agent will ask questions to help the user understand the concept he is lacking. The question_agent is also used to ask questions about the user's understanding of the course, such as 'Do you feel like you completely understand what a Markov Chain is?' or 'Do you know the principle behind Young's double-slit experiment?'. \n### PROMPTING METHOD ###\nAsk the question agent to NOT complain, NOT ask for more information on its task, NOT answer as a chatbot. The question agent SHOULD answer a SINGLE question. It should only use web search if it cannot come up with any question by itself or make sure he is right about a complex question. It can think about a full problem but should output ONE SINGLE question of this problem; as you may decide to ask the agent for the follow-up questions later.", tools=[WebSearchTool()], max_steps=3)
 
   models["manager"] = CodeAgent(model=LiteLLMModel(model_id="claude-sonnet-4-20250514", api_key=api_key, temperature=0.1, max_tokens=300), managed_agents=[models["course"], models["question"]], name="manager_agent", description="This Agent is responsible for managing the conversation between the user and the course_agent and question_agent. It decides which agent to use based on the user's input and the context of the conversation. The manager_agent can also choose not to do anything if it believes it wouldn't help the user, or the user did not write enough to warrant an answer.", tools=[], max_steps=5)
 
@@ -95,31 +108,34 @@ def question_agent (context : str) -> str:
   with open(path.join(path.dirname(__file__), "storage", "api_key.txt"), "r") as f: api_key = f.read().strip()
   model = LiteLLMModel(
     model_id="anthropic/claude-opus-4-20250514",
-    temperature=1,
+    temperature=0.3,
     api_key= api_key# in practice we would not hardcode the API key, but use an environment variable or a secure vault service
   )
   
   prompt = """
-Role: You're a tutor AI determining if enough context has been gathered to begin teaching.  
+  ### SYSTEM PROMPT ###
+Role: You're a tutor AI determining if enough context has been gathered to begin teaching and writing courses for the student.  
 Rules:  
 1. Analyze ONLY the conversation history below  
 2. If essential teaching context is present (subject, level, etc..):  
-   - Output EXACTLY: `%Question_end%`  
+   - Output EXACTLY: [%QE%]  
    - Do not be strict, but ensure the context is sufficient to start teaching
 3. If a CRITICAL and ESSENTIAL information is missing:  
    - Output ONE question to gather the MOST URGENT missing information  
    - Phrase it as a SINGLE question only (no prefixes/suffixes)  
 
-Conversation History CONSIDER THE FOLLOWING ONLY, IMPORTANT:  
+Conversation History CONSIDER THE FOLLOWING ONLY, IMPORTANT:
+### CONVERSATION HISTORY ###
 {history}  
 
+### SYSTEM PROMPT ###
 Output Instructions:  
-- ONLY `%Question_end%` or ONE question  
-- NO explanations, NO markdown, NO apologies  
+- RETURN ONLY the following 6 characters tag: [%QE%] or return a single question  
+- NO explanations, NO markdown, NO apologies
 - Example valid outputs:  
-    -`%Question_end%`  
-    -`What specific topic in algebra do you need help with?`  
-    -`Are you preparing for an exam or just general practice?`  
+    -`[%QE%]`  
+    -`What specific topic in algebra do you need help with?`
+    -`Are you interested in numerical methods or theoretical aspects of Markov Chains?`
 """
   prompt = str(prompt.format(history = context))
   return model(
