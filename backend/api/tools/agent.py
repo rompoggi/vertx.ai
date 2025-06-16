@@ -1,8 +1,7 @@
 
 from smolagents import CodeAgent, LiteLLMModel, WebSearchTool
-
 from .context_building import build_context
-from smolagents import LiteLLMModel
+from os import path
 
 DEBUG = True
 
@@ -75,7 +74,7 @@ def run_agent(body: list[dict]) -> list[dict]:
 
 def define_models(agent) -> dict:
   models = dict()
-  with open("./api_key.txt", "r") as f:
+  with open(path.join(path.dirname(__file__), "storage", "api_key.txt"), "r") as f:
     api_key = f.read().strip()
 
   models["context_to_prompt"] = LiteLLMModel(model_id="claude-3-5-haiku-latest", api_key=api_key, temperature=0.2, max_tokens=5000)
@@ -92,7 +91,8 @@ def question_agent (context : str) -> str:
   """
   determines if enough inital questions have been asked to start the conversation, if not, it will ask the user a question
   """
-  api_key = open(r"backend\api\tools\storage\api_key.txt", "r", encoding="utf-8").read()
+  # actual file is in "storage/"
+  with open(path.join(path.dirname(__file__), "storage", "api_key.txt"), "r") as f: api_key = f.read().strip()
   model = LiteLLMModel(
     model_id="anthropic/claude-opus-4-20250514",
     temperature=1,
