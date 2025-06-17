@@ -1,14 +1,26 @@
+# /usr/bin/python3
 from smolagents.tools import Tool
 from rdkit import Chem
 from rdkit.Chem import Draw
 import uuid
 
+
 class MoleculeImageTool(Tool):
     name = "molecule_image"
-    description = "Generates a molecule image from a SMILES formula and saves it as a PNG."
+    description = (
+        "Generates a molecule image from a SMILES formula and saves it as a PNG."
+    )
     inputs = {
-        "formula": {"type": "string", "description": "SMILES formula of the molecule", "nullable": True},
-        "output_path": {"type": "string", "description": "Path to save the PNG image", "nullable": True}
+        "formula": {
+            "type": "string",
+            "description": "SMILES formula of the molecule",
+            "nullable": True,
+        },
+        "output_path": {
+            "type": "string",
+            "description": "Path to save the PNG image",
+            "nullable": True,
+        },
     }
     output_type = "string"
 

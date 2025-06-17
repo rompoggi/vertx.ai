@@ -1,4 +1,4 @@
-
+# /usr/bin/python3
 from smolagents import LiteLLMModel, ChatMessage
 
 """
@@ -27,33 +27,49 @@ You should NOT answer the questions asked by the user, you should just analyze t
 
 Do NOT ask questions to the User. Answer by saying "the user..." instead of "you...". You are talking to another ChatBot, not to the user. This model needs to have information from you. You cannot ask questions at all. If you don't know how to provide analysis, say so and stop generating."""
 
+
 def build_context(body: list[dict]) -> list[dict]:
     """
     Builds the context for the Manager agent from the body of the document.
-    
+
     Args:
         body (dict): The body of the document, i.e. :[{role="fixedquestion", content="What would you like to work on today?"}, {role="user", content="I'm working on Markov Chains."}].
-    
+
     Returns:
         dict: The built context for the Manager agent.
     """
     return_body = body
-    return_body[-1]["content"] = "### ORIGINAL USER PROMPT ###\n" + body[-1]["content"] + "\n### SENTIMENT ANALYSIS RESULT ###\n" + user_state_estimator(body).content
+    return_body[-1]["content"] = (
+        "### ORIGINAL USER PROMPT ###\n"
+        + body[-1]["content"]
+        + "\n### SENTIMENT ANALYSIS RESULT ###\n"
+        + user_state_estimator(body).content
+    )
     return return_body
+
 
 def user_state_estimator(body: list[dict]) -> ChatMessage:
     # Call a Claude LLM
     # load api_key from ./api_key.txt
     # with open("./api_key.txt", "r") as f:
     #     key = f.read().strip()
-    key="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"
-    model = LiteLLMModel(model_id="claude-3-5-haiku-latest", temperature=0.3, max_tokens=300, api_key=key)
+    key = "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"
+    model = LiteLLMModel(
+        model_id="claude-3-5-haiku-latest", temperature=0.3, max_tokens=300, api_key=key
+    )
     add_prompt = body
     add_prompt[-1]["content"] = last_content_prompted(body)
     return model.generate(add_prompt)
 
+
 def last_content_prompted(body):
-  return "### ORIGINAL USER PROMPT ###\n" + body[-1]["content"] +"\n### SYSTEM PROMPT ###\n" + USER_STATE_ESTIMATOR_SYSTEM_PROMPT
+    return (
+        "### ORIGINAL USER PROMPT ###\n"
+        + body[-1]["content"]
+        + "\n### SYSTEM PROMPT ###\n"
+        + USER_STATE_ESTIMATOR_SYSTEM_PROMPT
+    )
+
 
 if __name__ == "__main__":
     # Example usage
@@ -61,6 +77,9 @@ if __name__ == "__main__":
         {"role": "assistant", "content": "What would you like to work on today?"},
         {"role": "user", "content": "I'm working on Markov Chains"},
         {"role": "assistant", "content": "Do you need help?"},
-        {"role": "user", "content": "Yes, I get what Markov Chains are, but I don't understand how to calculate the transition matrix from a description..."}
+        {
+            "role": "user",
+            "content": "Yes, I get what Markov Chains are, but I don't understand how to calculate the transition matrix from a description...",
+        },
     ]
     print(build_context(body))

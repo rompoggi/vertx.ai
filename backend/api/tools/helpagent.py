@@ -1,5 +1,6 @@
+# /usr/bin/python3
 from smolagents import CodeAgent, LiteLLMModel
-from chem import MoleculeImageTool 
+from chem import MoleculeImageTool
 from deepthinking import DeepThinkingTool
 import uuid
 
@@ -29,10 +30,10 @@ Rules:
 - Images must contain integrated text
 - Maximum 15-word captions
 - For visuals: Always highlight 1 key learning point
-- No useless informations or formatting : only text or image that is relevant to the student"""
+- No useless informations or formatting : only text or image that is relevant to the student""",
 )
 
-input ="""Test Prompt for French History Assistance
+input = """Test Prompt for French History Assistance
 Scenario: A high school student is preparing for an exam on 19th-century French political movements but keeps confusing the July Revolution (1830) and the February Revolution (1848). They’ve mixed up key causes and outcomes.
 
 Student’s Query:

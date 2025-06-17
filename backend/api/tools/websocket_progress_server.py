@@ -1,3 +1,4 @@
+# /usr/bin/python3
 """
 Serveur WebSocket pour la barre de progression Duolingo
 Gère les mises à jour de progression en temps réel via WebSocket
@@ -10,7 +11,7 @@ import random
 import json
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'duolingo_progress_secret'
+# app.config['SECRET_KEY'] = 'duolingo_progress_secret'
 
 # Configuration CORS pour permettre les connexions depuis le frontend
 CORS(app, origins="http://localhost:3000")
