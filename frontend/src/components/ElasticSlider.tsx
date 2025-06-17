@@ -168,7 +168,7 @@ const Slider: React.FC<SliderProps> = ({
     controlledValue !== undefined ? controlledValue : defaultValue
   );
   const sliderRef = useRef<HTMLDivElement>(null);
-  const [region, setRegion] = useState<"left" | "middle" | "right">("middle");
+  // const [region, setRegion] = useState<"left" | "middle" | "right">("middle");
   const clientX = useMotionValue(0);
   const overflow = useMotionValue(0);
   const scale = useMotionValue(1);
@@ -183,13 +183,13 @@ const Slider: React.FC<SliderProps> = ({
       const { left, right } = sliderRef.current.getBoundingClientRect();
       let newValue: number;
       if (latest < left) {
-        setRegion("left");
+        // setRegion("left");
         newValue = left - latest;
       } else if (latest > right) {
-        setRegion("right");
+        // setRegion("right");
         newValue = latest - right;
       } else {
-        setRegion("middle");
+        // setRegion("middle");
         newValue = 0;
       }
       overflow.jump(decay(newValue, MAX_OVERFLOW));
@@ -212,10 +212,10 @@ const Slider: React.FC<SliderProps> = ({
     }
   };
 
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    handlePointerMove(e);
-    e.currentTarget.setPointerCapture(e.pointerId);
-  };
+  // const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+  //   handlePointerMove(e);
+  //   e.currentTarget.setPointerCapture(e.pointerId);
+  // };
 
   const handlePointerUp = () => {
     animate(overflow, 0, { type: "spring", bounce: 0.5 });

@@ -1,14 +1,8 @@
 import React, { useRef } from "react";
 
-interface Position {
-  x: number;
-  y: number;
-}
-
 interface SpotlightCardProps extends React.PropsWithChildren {
   className?: string;
   spotlightColor?: `rgba(${number}, ${number}, ${number}, ${number})`;
-// 
 }
 
 const spotlightCardStyles = `
@@ -43,9 +37,6 @@ const spotlightCardStyles = `
   opacity: 0.6;
 }
 `;
-
-// const spotlightColor = `#E27100`
-// const spotlightColor = `#f39232`
 
 const SpotlightCard: React.FC<SpotlightCardProps> = ({
   children,

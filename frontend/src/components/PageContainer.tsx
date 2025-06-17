@@ -6,7 +6,7 @@ const pageContainerStyles = `
   .page-container {
     display: flex;
     width: 80vw;
-    height: 90vh;
+    height: 80vh;
     margin: 40px auto;
     border-radius: 2rem;
     background: rgba(0, 0, 0, 0.65);
@@ -177,10 +177,10 @@ const generateUniqueId = () => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
 
-const PageContainer: React.FC<PageContainerProps> = ({ 
-  userName = 'Utilisateur', 
-  selectedSubjects = [], 
-  selectedTopics = [] 
+const PageContainer: React.FC<PageContainerProps> = ({
+  userName = 'Utilisateur',
+  selectedSubjects = [],
+  selectedTopics = []
 }) => {
   const [textBlocks, setTextBlocks] = useState<TextBlock[]>([]);
   const [mediaImages, setMediaImages] = useState<string[]>([]);
@@ -191,10 +191,10 @@ const PageContainer: React.FC<PageContainerProps> = ({
   // Initialize and update text blocks when props change
   useEffect(() => {
     const createWelcomeMessage = () => {
-      const subjectsText = selectedSubjects.length > 0 
+      const subjectsText = selectedSubjects.length > 0
         ? selectedSubjects.map(s => s.name).join(', ')
         : 'various fascinating subjects';
-      
+
       const topicsText = selectedTopics.length > 0
         ? selectedTopics.slice(0, 3).join(', ') + (selectedTopics.length > 3 ? '...' : '')
         : 'general exploration';
@@ -215,14 +215,14 @@ This environment allows you to:
     if (!isInitialized) {
       // First initialization
       const initialBlockObjects: TextBlock[] = [
-        { 
+        {
           id: generateUniqueId(),
-          text: createWelcomeMessage(), 
-          mode: 'render' 
+          text: createWelcomeMessage(),
+          mode: 'render'
         },
-        ...[].map(text => ({ 
+        ...[].map(text => ({
           id: generateUniqueId(),
-          text, 
+          text,
           mode: 'edit' as const
         }))
       ];
@@ -245,13 +245,13 @@ This environment allows you to:
     }
   }, [userName, selectedSubjects, selectedTopics, isInitialized]);
 
-  
-    // Add new text block from API
+
+  // Add new text block from API
   const addTextBlockFromAPI = (text: string, balise: string, color: string) => {
-    setTextBlocks(prevBlocks => [...prevBlocks, { 
+    setTextBlocks(prevBlocks => [...prevBlocks, {
       id: generateUniqueId(),
-      text, 
-      mode: 'render', 
+      text,
+      mode: 'render',
       balise,
       color,
     }]);
@@ -299,13 +299,13 @@ This environment allows you to:
       newBlocks[idx].mode = 'render';
       setTextBlocks(newBlocks);
       // API call on save
-      // axios.post('http://localhost:8000/api/body', {
-      axios.post('http://localhost:8000/api/demo', { // Send to demo since body does not work yet
+      axios.post('http://localhost:8000/api/body', {
+        // axios.post('http://localhost:8000/api/demo', { // Send to demo since body does not work yet
         id: idx,
         text: newBlocks[idx].text,
         balise: newBlocks[idx].balise || 'default'
       }).then(response => {
-        console.log('Reponse: ',response);
+        console.log('Reponse: ', response);
         // If the API responds with data, handle it based on balise type
         if (response.data) {
           handleAPIResponse(response.data);
@@ -325,99 +325,99 @@ This environment allows you to:
 
   return (
     <>
-    <style>{pageContainerStyles}</style>
-    <div className="page-container">
-      {/* Left: Text Area */}
-      <div className="text-area" ref={textAreaContainerRef}>
-        <h2 className="title">AI Assistant</h2>
-        <div className="divider" />
-        {textBlocks.map((block, idx) => (
-          <div
-            key={block.id}
-            className="text-block-container"
-            style={{
-              background: block.color ? block.color : undefined,
-              borderRadius: '12px',
-            }}
-          >
-            <button
-              onClick={() => setTextBlocks(textBlocks.filter((_, i) => i !== idx))}
-              className="delete-button"
-              title="Delete block"
+      <style>{pageContainerStyles}</style>
+      <div className="page-container">
+        {/* Left: Text Area */}
+        <div className="text-area" ref={textAreaContainerRef}>
+          <h2 className="title">AI Assistant</h2>
+          <div className="divider" />
+          {textBlocks.map((block, idx) => (
+            <div
+              key={block.id}
+              className="text-block-container"
+              style={{
+                background: block.color ? block.color : undefined,
+                borderRadius: '12px',
+              }}
             >
-            </button>
-            {block.mode === 'edit' ? (
-              <textarea
-                ref={el => textAreaRefs.current[idx] = el}
-                value={block.text}
-                onKeyDown={e => handleKeyDown(e, idx)}
-                onChange={e => {
-                  const newBlocks = [...textBlocks];
-                  newBlocks[idx].text = e.target.value;
-                  setTextBlocks(newBlocks);
-                  // Auto-resize
-                  const ref = textAreaRefs.current[idx];
-                  if (ref) {
-                    ref.style.height = 'auto';
-                    ref.style.height = ref.scrollHeight + 'px';
-                  }
-                }}
-                style={{
-                  background: block.color ? block.color : undefined,
-                  color: block.color ? 'white' : undefined,
-                }}
-                className="text-input"
-              />
-            ) : (
-              <div
-                onClick={() => handleBlockClick(idx)}
-                style={{
-                  background: block.color ? block.color : undefined,
-                  color: block.color ? 'white' : undefined,
-                }}
-                className="text-display"
-                title="Click to edit"
+              <button
+                onClick={() => setTextBlocks(textBlocks.filter((_, i) => i !== idx))}
+                className="delete-button"
+                title="Delete block"
               >
-                <LatexRenderer text={block.text} />
-              </div>
-            )}
-          </div>
-        ))}
-        <button
-          onClick={() => {
-            setTextBlocks([...textBlocks, { 
-              id: generateUniqueId(),
-              text: '', 
-              mode: 'edit',
-            }]);
-            // Scroll to bottom after adding new block
-            setTimeout(() => {
-              if (textAreaContainerRef.current) {
-                textAreaContainerRef.current.scrollTop = textAreaContainerRef.current.scrollHeight;
-              }
-            }, 0);
-          }}
-          className="add-block-button"
-        >
-          + Add Text Block
-        </button>
-      </div>
-      {/* Right: Media Area */}
-      <div className="media-area">
-        <h2 className="title">Media</h2>
-        <div className="divider" />
-        <div className="media-container">
-          {mediaImages.map((img, idx) => (
-            <img
-              key={idx}
-              src={img}
-              alt={`media-${idx}`}
-              className="media-image"
-            />
+              </button>
+              {block.mode === 'edit' ? (
+                <textarea
+                  ref={el => textAreaRefs.current[idx] = el}
+                  value={block.text}
+                  onKeyDown={e => handleKeyDown(e, idx)}
+                  onChange={e => {
+                    const newBlocks = [...textBlocks];
+                    newBlocks[idx].text = e.target.value;
+                    setTextBlocks(newBlocks);
+                    // Auto-resize
+                    const ref = textAreaRefs.current[idx];
+                    if (ref) {
+                      ref.style.height = 'auto';
+                      ref.style.height = ref.scrollHeight + 'px';
+                    }
+                  }}
+                  style={{
+                    background: block.color ? block.color : undefined,
+                    color: block.color ? 'white' : undefined,
+                  }}
+                  className="text-input"
+                />
+              ) : (
+                <div
+                  onClick={() => handleBlockClick(idx)}
+                  style={{
+                    background: block.color ? block.color : undefined,
+                    color: block.color ? 'white' : undefined,
+                  }}
+                  className="text-display"
+                  title="Click to edit"
+                >
+                  <LatexRenderer text={block.text} />
+                </div>
+              )}
+            </div>
           ))}
+          <button
+            onClick={() => {
+              setTextBlocks([...textBlocks, {
+                id: generateUniqueId(),
+                text: '',
+                mode: 'edit',
+              }]);
+              // Scroll to bottom after adding new block
+              setTimeout(() => {
+                if (textAreaContainerRef.current) {
+                  textAreaContainerRef.current.scrollTop = textAreaContainerRef.current.scrollHeight;
+                }
+              }, 0);
+            }}
+            className="add-block-button"
+          >
+            + Add Text Block
+          </button>
+        </div>
+        {/* Right: Media Area */}
+        <div className="media-area">
+          <h2 className="title">Media</h2>
+          <div className="divider" />
+          <div className="media-container">
+            {mediaImages.map((img, idx) => (
+              <img
+                key={idx}
+                src={img}
+                alt={`media-${idx}`}
+                className="media-image"
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 };

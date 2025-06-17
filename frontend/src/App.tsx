@@ -3,7 +3,6 @@ import axios from 'axios';
 import ChromaGrid from './components/ChromaGrid.tsx';
 import Header from './components/Header.tsx';
 import SpotlightCard from './components/SpotlightCard.tsx';
-import ApiWorkflow from './components/ApiWorkflow.tsx';
 import DotGrid from './components/DotGrid.tsx';
 import GradientText from './components/GradientText.tsx'
 import GraphRenderer from './components/GraphRenderer.tsx';
@@ -138,18 +137,18 @@ const App: React.FC = () => {
     initializeQuestionnaire();
   }, []);
 
-  const processText = async () => {
-    try {
-      setError('');
-      const response = await axios.post('http://localhost:8000/api/process', {
-        text: inputText
-      });
-      setProcessedText(response.data.processed_text);
-    } catch (err) {
-      setError('Error processing text. Please try again.');
-      console.error('Error:', err);
-    }
-  };
+  // const processText = async () => {
+  //   try {
+  //     setError('');
+  //     const response = await axios.post('http://localhost:8000/api/process', {
+  //       text: inputText
+  //     });
+  //     setProcessedText(response.data.processed_text);
+  //   } catch (err) {
+  //     setError('Error processing text. Please try again.');
+  //     console.error('Error:', err);
+  //   }
+  // };
 
   // Function to update available topics based on selected subjects
   const updateAvailableTopics = (selectedItems: string[], selectedIndices: number[]) => {
@@ -671,78 +670,78 @@ const App: React.FC = () => {
 <GraphRenderer />
 export default App;
 
-{/*           
-          <div style={{ 
-            maxWidth: '3000px',
-            width: '100%',
-            margin: '0 auto',
-            position: 'relative',
-            zIndex: 1
-          }}> 
-          </div>
-        </div>
-      </body>
-    </>
-  );
-};
+// {/*           
+//           <div style={{ 
+//             maxWidth: '3000px',
+//             width: '100%',
+//             margin: '0 auto',
+//             position: 'relative',
+//             zIndex: 1
+//           }}> 
+//           </div>
+//         </div>
+//       </body>
+//     </>
+//   );
+// };
 
-export default App;
-          onItemSelect={(item, index) => {
-            console.log('Selected subject:', item, 'at index:', index);
-          }}
-          ></AnimatedList>   
+// export default App;
+//           onItemSelect={(item, index) => {
+//             console.log('Selected subject:', item, 'at index:', index);
+//           }}
+//           ></AnimatedList>   
 
-          <div
-            style={{
-              width: '100%',
-              height: '2px',
-              background: 'linear-gradient(60deg, #e27100 20%, #ffd246 100%)',
-              opacity: 0.7,
-              margin: '32px 0',
-              borderRadius: '1px',
-            }}
-          />
-        </div>
-            </Step>
-            <Step>
-              <h2>How about an input?</h2>
-              <input 
-                type="text"
-                value={name} 
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} 
-                placeholder="Your name?" 
-              />
-            </Step>
-            <Step>
-              <h2>Final Step</h2>
-              <p>You made it!</p>
-            </Step>
-          </Stepper>
+//           <div
+//             style={{
+//               width: '100%',
+//               height: '2px',
+//               background: 'linear-gradient(60deg, #e27100 20%, #ffd246 100%)',
+//               opacity: 0.7,
+//               margin: '32px 0',
+//               borderRadius: '1px',
+//             }}
+//           />
+//         </div>
+//             </Step>
+//             <Step>
+//               <h2>How about an input?</h2>
+//               <input 
+//                 type="text"
+//                 value={name} 
+//                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} 
+//                 placeholder="Your name?" 
+//               />
+//             </Step>
+//             <Step>
+//               <h2>Final Step</h2>
+//               <p>You made it!</p>
+//             </Step>
+//           </Stepper>
           
-        </div> */}
+//         </div> */}
 
-{/* 
-          <ApiWorkflow
-            inputText={inputText}
-            setInputText={setInputText}
-            processedText={processedText}
-            processText={processText}
-            error={error}
-          /> */}
+// {/* 
+//           <ApiWorkflow
+//             inputText={inputText}
+//             setInputText={setInputText}
+//             processedText={processedText}
+//             processText={processText}
+//             error={error}
+//           /> */}
 
-{/* <GraphRenderer /> */ }
-{/*           
-          <div style={{ 
-            maxWidth: '3000px',
-            width: '100%',
-            margin: '0 auto',
-            position: 'relative',
-            zIndex: 1
-          }}> 
-          </div>
-        </div>
-      </body>
-    </>
-  );
-};
-export default App; */}
+// {/* <GraphRenderer /> */ }
+// {/*           
+//           <div style={{ 
+//             maxWidth: '3000px',
+//             width: '100%',
+//             margin: '0 auto',
+//             position: 'relative',
+//             zIndex: 1
+//           }}> 
+//           </div>
+//         </div>
+//       </body>
+//     </>
+//   );
+// };
+// export default App; */}

@@ -131,14 +131,6 @@ const DotGrid: React.FC<DotGridProps> = ({
     const rows = Math.floor((height + gap) / (dotSize + gap));
     const cell = dotSize + gap;
 
-    const gridW = cell * cols - gap;
-    const gridH = cell * rows - gap;
-
-    const extraX = width - gridW;
-    const extraY = height - gridH;
-
-    // const startX = extraX / 2 + dotSize / 2;
-    // const startY = extraY / 2 + dotSize / 2;
     const startX = 0
     const startY = 0
 

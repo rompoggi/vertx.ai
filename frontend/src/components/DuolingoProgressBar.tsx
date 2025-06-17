@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDragon, faScroll } from '@fortawesome/free-solid-svg-icons';
 
-// import { Socket } from 'socket.io-client';
-
 const duolingoProgressBarStyles = `
 .duolingo-progress-container {
   display:
