@@ -1,5 +1,7 @@
 # /usr/bin/python3
 from flask import Blueprint, request, jsonify
+import base64
+import os
 
 from .tools.plot_functions import plot_function
 from .tools.demo import demo
@@ -34,7 +36,13 @@ def body_api():
         return run_agent([text_blocks[key] for key in sorted(text_blocks.keys())])
     except Exception as e:
         print("got error: ", e)
-        return demo(data)
+        with open(os.path.join(os.path.dirname(__file__), "api_failure.png"), "rb") as f:
+            image_data = f.read()
+            image_base64 = base64.b64encode(image_data).decode("utf-8")
+            return jsonify({
+                "balise": "media_image", 
+                "text": f"data:image/png;base64,{image_base64}"
+            })
 
 
 @api.route("/demo", methods=["POST"])

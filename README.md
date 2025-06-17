@@ -1,11 +1,10 @@
 # vortx.ai
 
-vortx.ai is an AI-powered assistant platform designed to help you connect your cloud, get help from the internet, and complete your tasks efficiently. Our mission is to streamline your workflow with intelligent automation and seamless integration. The platform features:
+vortx.ai is an AI-powered assistant platform designed to help you in your studies by offering visuals and explaination as you need it. Our mission is to streamline your workflow with intelligent automation and seamless integration. The platform features:
 
 - **AI Assistant**: Interact with an intelligent assistant for learning, productivity, and automation.
 - **Media Generation**: Visualize concepts and generate images or plots in real time.
 - **Personalized Learning**: Tailor your experience by selecting subjects and topics of interest.
-- **Modern UI**: Built with React and TypeScript for a beautiful, responsive user experience.
 - **Backend**: Python Flask API for agent logic, media generation, and real-time updates.
 
 <div style="display: flex">
@@ -60,6 +59,23 @@ vortx.ai is an AI-powered assistant platform designed to help you connect your c
    cd ../frontend
    npm start
    ```
+
+## API Key Configuration
+
+The project requires an API key for the AI models to function. You can set up your API key in one of two ways:
+
+1. **Using Environment Variables (Recommended):**
+   - Create a `.env` file in the `/backend` directory
+   - Add your API key as follows:
+     ```
+     API_KEY=your_api_key_here
+     ```
+
+2. **Using a Storage File (Legacy Method):**
+   - Create a file at `backend/api/tools/storage/api_key.txt`
+   - Add your API key as plain text in this file
+
+Note: The environment variable method is preferred and the storage file method will be deprecated in future versions.
 
 ## How vortx.ai Works
 
