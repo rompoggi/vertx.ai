@@ -23,7 +23,7 @@ const animateListStyles = `
 }
 
 .scroll-list::-webkit-scrollbar {
-  width: 8px;
+  width:4px;
 }
 
 .scroll-list::-webkit-scrollbar-track {
@@ -36,6 +36,7 @@ const animateListStyles = `
 }
 
 .no-scrollbar::-webkit-scrollbar {
+  height: 20%;
   display: none;
 }
 

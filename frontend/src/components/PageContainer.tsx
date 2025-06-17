@@ -164,6 +164,7 @@ interface TextBlock {
   text: string;
   mode: 'edit' | 'render';
   balise?: string;
+  color?: string;
 }
 
 interface PageContainerProps {
@@ -244,13 +245,15 @@ This environment allows you to:
     }
   }, [userName, selectedSubjects, selectedTopics, isInitialized]);
 
+  
     // Add new text block from API
-  const addTextBlockFromAPI = (text: string, balise: string) => {
+  const addTextBlockFromAPI = (text: string, balise: string, color: string) => {
     setTextBlocks(prevBlocks => [...prevBlocks, { 
       id: generateUniqueId(),
       text, 
       mode: 'render', 
-      balise 
+      balise,
+      color,
     }]);
     // Scroll to bottom after adding new block
     setTimeout(() => {
@@ -267,8 +270,10 @@ This environment allows you to:
         setMediaImages(prevImages => [...prevImages, response.text]);
         break;
       case 'cours':
+        addTextBlockFromAPI(response.text, response.balise, "rgba(255,0,0,0.15)");
+        break;
       case 'question':
-        addTextBlockFromAPI(response.text, response.balise);
+        addTextBlockFromAPI(response.text, response.balise, "blue");
         break;
       default:
         console.warn(`Unknown balise type: ${response.balise}`);
@@ -294,11 +299,13 @@ This environment allows you to:
       newBlocks[idx].mode = 'render';
       setTextBlocks(newBlocks);
       // API call on save
-      axios.post('http://localhost:8000/api/body', {
+      // axios.post('http://localhost:8000/api/body', {
+      axios.post('http://localhost:8000/api/demo', { // Send to demo since body does not work yet
         id: idx,
         text: newBlocks[idx].text,
         balise: newBlocks[idx].balise || 'default'
       }).then(response => {
+        console.log('Reponse: ',response);
         // If the API responds with data, handle it based on balise type
         if (response.data) {
           handleAPIResponse(response.data);
@@ -325,7 +332,14 @@ This environment allows you to:
         <h2 className="title">AI Assistant</h2>
         <div className="divider" />
         {textBlocks.map((block, idx) => (
-          <div key={block.id} className="text-block-container">
+          <div
+            key={block.id}
+            className="text-block-container"
+            style={{
+              background: block.color ? block.color : undefined,
+              borderRadius: '12px',
+            }}
+          >
             <button
               onClick={() => setTextBlocks(textBlocks.filter((_, i) => i !== idx))}
               className="delete-button"
@@ -348,11 +362,19 @@ This environment allows you to:
                     ref.style.height = ref.scrollHeight + 'px';
                   }
                 }}
+                style={{
+                  background: block.color ? block.color : undefined,
+                  color: block.color ? 'white' : undefined,
+                }}
                 className="text-input"
               />
             ) : (
               <div
                 onClick={() => handleBlockClick(idx)}
+                style={{
+                  background: block.color ? block.color : undefined,
+                  color: block.color ? 'white' : undefined,
+                }}
                 className="text-display"
                 title="Click to edit"
               >
@@ -366,7 +388,7 @@ This environment allows you to:
             setTextBlocks([...textBlocks, { 
               id: generateUniqueId(),
               text: '', 
-              mode: 'edit' 
+              mode: 'edit',
             }]);
             // Scroll to bottom after adding new block
             setTimeout(() => {

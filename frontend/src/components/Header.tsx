@@ -4,7 +4,7 @@ import Logo from './Logo.tsx';
 const headerStyles = `
 .app-header {
   width: 100%;
-  background: linear-gradient(90deg, #481700 0%, #FFBC1B 100%);
+  background: linear-gradient(90deg,rgb(103, 33, 1) 0%, #FFBC1B 50%, rgb(103, 33, 1) 100%);
   padding: 0 32px;
   height: 64px;
   display: flex;
@@ -74,16 +74,18 @@ const headerStyles = `
 }
 
 .get-started-btn {
-  background: #FFD246;
-  color: #481700;
+  background: linear-gradient(90deg, #ffd246 0%, #e27100 100%);
+  color: #222;
   font-weight: 700;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 10px 24px;
   font-size: 1.1rem;
+  font-weight: 600,
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   margin-left: 8px;
+  boxShadow: '0 2px 12px rgba(226,113,0,0.12)';
 }
 .get-started-btn:hover {
   background: #FFBC1B;
@@ -103,8 +105,7 @@ const Header: React.FC = () => {
         </div>
         <a className="menu-link" href="#docs">GitHub</a>
         <a className="menu-link" href="#signin">Demo</a>
-        <button className="get-started-btn">Get Started</button>
-      </nav>
+        <button className="get-started-btn">Get Started</button>      </nav>
     </header>
     </>
   );

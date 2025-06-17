@@ -5,8 +5,9 @@ const chromaGridStyles = `
 .chroma-grid {
   position: relative;
   width: 80%;
-  max-width: 100vw;
+  // max-width: 80vw;
   height: 100%;
+  // min-height: 500px;
   display: grid;
   grid-template-columns: repeat(var(--cols, 1), 1fr);
   grid-auto-rows: auto;
@@ -44,7 +45,7 @@ const chromaGridStyles = `
     --cols: 1;
     grid-template-columns: 320px;
     gap: 0.75rem;
-    padding: 1rem;
+    padding: 0.5rem;
   }
 }
 
@@ -53,8 +54,7 @@ const chromaGridStyles = `
   display: flex;
   flex-direction: column;
   width: 320px;
-  height: 100%;
-  max-height: 500px;
+  min-height: 500px;
   border-radius: 20px;
   overflow: hidden;
   border: 1px solid #333;
@@ -222,6 +222,13 @@ const chromaGridStyles = `
   display: block;
   content: "";
 }
+
+.chroma-name-block {
+  min-height: 2.4em; /* enough for two lines */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
 `;
 
 export interface ChromaItem {
@@ -340,7 +347,7 @@ const orangeGrid: ChromaItem[] = [
     handle: "@thomas-turkieh",
     borderColor: "#10B981",
     gradient: "linear-gradient(165deg, #FFBC1B, #000)",
-    url: "https://www.linkedin.com/in/thomas-turkieh-09a273231/"
+    url: "https://media.licdn.com/dms/image/v2/C4E03AQHBP-RcilWHyQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1644261388068?e=1755734400&v=beta&t=VKUlEWRNLx4eucjgFd_TgrjoZOkAEvBS0L4tzad6UTU"
   },
   {
     image: "https://minio.binets.fr/sigma-prod/pictures/users/vianney.gauthier?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=sigma-prod%2F20250613%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250613T204148Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=47164d516f59234c50859beae7b5d00da2d2baabcf881cd732773b2fa18ae87a",
@@ -460,10 +467,11 @@ const orangeGrid: ChromaItem[] = [
               <img src={c.image} alt={c.title} loading="lazy" />
             </div>
             <footer className="chroma-info">
-              <span className="first-name">{firstName}</span>
+              <span className="chroma-name-block">
+                <span className="first-name">{firstName}</span>
+                <span className="family-name">{familyName}</span>
+              </span>
               <span className="handle">{c.handle}</span>
-              <span className="family-name">{familyName}</span>
-              <span></span>
               <span className="chroma-blank-row"></span>
               <span className="role" style={{ gridColumn: "1 / span 2" }}>
                 Student @ Ecole Polytechnique

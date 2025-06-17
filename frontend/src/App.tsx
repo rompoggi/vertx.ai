@@ -13,6 +13,9 @@ import AnimatedList from './components/AnimatedList.tsx';
 import PageContainer from './components/PageContainer.tsx';
 import DuolingoProgressBar from './components/DuolingoProgressBar.tsx';
 import TalentTree from './components/TalentTree.tsx';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRocket } from '@fortawesome/free-solid-svg-icons';
+
 
 
 const App: React.FC = () => {
@@ -25,7 +28,7 @@ const App: React.FC = () => {
   const [selectedSubjects, setSelectedSubjects] = useState<any[]>([]);
   const [availableTopics, setAvailableTopics] = useState<string[]>([]);
   const [subjectsData, setSubjectsData] = useState<any[]>([]);
-  const [selectedEducationLevel, setSelectedEducationLevel] = useState<{item: string, index: number} | null>(null);
+  const [selectedEducationLevel, setSelectedEducationLevel] = useState<{ item: string, index: number } | null>(null);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isQuestionnaireCompleted, setIsQuestionnaireCompleted] = useState(false);
@@ -35,7 +38,7 @@ const App: React.FC = () => {
     try {
       setError('');
       console.log('🚀 Initializing questionnaire with hardcoded data...');
-      
+
       // Hardcoded data instead of API call
       const hardcodedData = {
         success: true,
@@ -48,7 +51,7 @@ const App: React.FC = () => {
           },
           {
             "id": "high_school",
-            "name": "High School", 
+            "name": "High School",
             "description": "Grades 9-12",
             "ages": "14-18 years"
           },
@@ -72,53 +75,53 @@ const App: React.FC = () => {
           }
         ],
         subjects: [
-          {"id": "math", "name": "Mathematics 🧮", "topics": ["Algebra", "Geometry", "Calculus", "Statistics"]},
-          {"id": "physics", "name": "Physics ⚛️", "topics": ["Mechanics", "Electricity", "Waves", "Thermodynamics"]},
-          {"id": "chemistry", "name": "Chemistry 🧪", "topics": ["Organic", "Inorganic", "Physical Chemistry"]},
-          {"id": "biology", "name": "Biology 🧬", "topics": ["Genetics", "Ecology", "Anatomy", "Cell Biology"]},
-          {"id": "computer_science", "name": "Computer Science 💻", "topics": ["Programming", "Algorithms", "Data Structures"]},
-          {"id": "history", "name": "History ⏳", "topics": ["World History", "US History", "Ancient Civilizations"]},
-          {"id": "geography", "name": "Geography 🌍", "topics": ["Physical Geography", "Human Geography", "Geopolitics"]},
-          {"id": "economics", "name": "Economics 💹", "topics": ["Microeconomics", "Macroeconomics", "Personal Finance"]},
-          {"id": "psychology", "name": "Psychology 🧠", "topics": ["Cognitive", "Social", "Developmental"]},
-          {"id": "literature", "name": "Literature 📚", "topics": ["American Literature", "World Literature", "Poetry"]},
-          {"id": "english", "name": "English 🇺🇸", "topics": ["Grammar", "Writing", "Literature"]},
-          {"id": "spanish", "name": "Spanish 🇪🇸", "topics": ["Conversation", "Grammar", "Culture"]},
-          {"id": "french", "name": "French 🇫🇷", "topics": ["Conversation", "Grammar", "Culture"]},
-          {"id": "other_languages", "name": "Other Languages 🌐", "topics": ["German", "Mandarin", "Japanese"]}
+          { "id": "math", "name": "Mathematics 🧮", "topics": ["Algebra", "Geometry", "Calculus", "Statistics"] },
+          { "id": "physics", "name": "Physics ⚛️", "topics": ["Mechanics", "Electricity", "Waves", "Thermodynamics"] },
+          { "id": "chemistry", "name": "Chemistry 🧪", "topics": ["Organic", "Inorganic", "Physical Chemistry"] },
+          { "id": "biology", "name": "Biology 🧬", "topics": ["Genetics", "Ecology", "Anatomy", "Cell Biology"] },
+          { "id": "computer_science", "name": "Computer Science 💻", "topics": ["Programming", "Algorithms", "Data Structures"] },
+          { "id": "history", "name": "History ⏳", "topics": ["World History", "US History", "Ancient Civilizations"] },
+          { "id": "geography", "name": "Geography 🌍", "topics": ["Physical Geography", "Human Geography", "Geopolitics"] },
+          { "id": "economics", "name": "Economics 💹", "topics": ["Microeconomics", "Macroeconomics", "Personal Finance"] },
+          { "id": "psychology", "name": "Psychology 🧠", "topics": ["Cognitive", "Social", "Developmental"] },
+          { "id": "literature", "name": "Literature 📚", "topics": ["American Literature", "World Literature", "Poetry"] },
+          { "id": "english", "name": "English 🇺🇸", "topics": ["Grammar", "Writing", "Literature"] },
+          { "id": "spanish", "name": "Spanish 🇪🇸", "topics": ["Conversation", "Grammar", "Culture"] },
+          { "id": "french", "name": "French 🇫🇷", "topics": ["Conversation", "Grammar", "Culture"] },
+          { "id": "other_languages", "name": "Other Languages 🌐", "topics": ["German", "Mandarin", "Japanese"] }
         ]
       };
-      
+
       console.log('📦 Using hardcoded data:', hardcodedData);
-      
+
       if (hardcodedData.success) {
         console.log('✅ Hardcoded data loaded successfully');
-        
+
         // Set education levels for US system
-        const levels = hardcodedData.education_levels.map((level: any) => 
+        const levels = hardcodedData.education_levels.map((level: any) =>
           `<strong>${level.name}</strong> (${level.description})`
         );
         console.log('🎓 Education levels processed:', levels);
         setEducationLevels(levels);
-        
+
         // Store raw subjects data for later use
         console.log('📚 Raw subjects data:', hardcodedData.subjects);
         console.log('📚 Number of subjects:', hardcodedData.subjects.length);
-        
+
         setSubjectsData(hardcodedData.subjects);
         console.log('💾 subjectsData state updated with', hardcodedData.subjects.length, 'subjects');
-        
+
         // Process subjects (now flattened without categories)
-        const allSubjects: string[] = hardcodedData.subjects.map((subject: any) => 
+        const allSubjects: string[] = hardcodedData.subjects.map((subject: any) =>
           `${subject.name} (${subject.topics.join(', ')})`
         );
         console.log('🔄 Processed subjects for display:', allSubjects);
         setSubjects(allSubjects);
-        
+
         // Mark data as loaded
         setIsDataLoaded(true);
         console.log('✅ Data marked as loaded');
-        
+
         console.log('🎉 Questionnaire initialized successfully with hardcoded data!');
       } else {
         console.error('❌ Hardcoded data failed - success is false');
@@ -155,7 +158,7 @@ const App: React.FC = () => {
     console.log('selectedIndices:', selectedIndices);
     console.log('isDataLoaded:', isDataLoaded);
     console.log('subjectsData length:', subjectsData.length);
-    
+
     if (!isDataLoaded || !subjectsData || subjectsData.length === 0) {
       console.warn('subjectsData is not loaded yet, retrying in 200ms...');
       // Retry after a short delay to allow data to load
@@ -169,9 +172,9 @@ const App: React.FC = () => {
       }, 200);
       return;
     }
-    
+
     console.log('Full subjectsData:', JSON.stringify(subjectsData, null, 2));
-    
+
     const selectedSubjectObjects = selectedIndices.map(index => {
       console.log(`Processing index ${index}`);
       if (index >= 0 && index < subjectsData.length) {
@@ -182,11 +185,11 @@ const App: React.FC = () => {
       console.warn('Invalid index:', index);
       return null;
     }).filter(subject => subject !== null);
-    
+
     console.log('selectedSubjectObjects count:', selectedSubjectObjects.length);
     console.log('selectedSubjectObjects:', JSON.stringify(selectedSubjectObjects, null, 2));
     setSelectedSubjects(selectedSubjectObjects);
-    
+
     // Collect all topics from selected subjects
     const allTopics: string[] = [];
     selectedSubjectObjects.forEach((subject, subjectIndex) => {
@@ -194,7 +197,7 @@ const App: React.FC = () => {
       console.log(`Subject has topics?`, 'topics' in subject);
       console.log(`Topics value:`, subject.topics);
       console.log(`Topics is array?`, Array.isArray(subject.topics));
-      
+
       if (subject && subject.topics && Array.isArray(subject.topics)) {
         console.log(`Adding topics from ${subject.name}:`, subject.topics);
         subject.topics.forEach((topic: string, topicIndex: number) => {
@@ -211,7 +214,7 @@ const App: React.FC = () => {
         });
       }
     });
-    
+
     console.log('Final allTopics count:', allTopics.length);
     console.log('Final allTopics:', allTopics);
     setAvailableTopics(allTopics);
@@ -222,7 +225,7 @@ const App: React.FC = () => {
   const submitQuestionnaireResults = async () => {
     try {
       setError('');
-      
+
       const questionnaireData = {
         name: name,
         educationLevel: selectedEducationLevel,
@@ -238,19 +241,19 @@ const App: React.FC = () => {
       console.log('Submitting questionnaire data:', questionnaireData);
 
       const response = await axios.post('http://localhost:8000/api/init', questionnaireData);
-      
+
       if (response.data.success) {
         console.log('Questionnaire submitted successfully:', response.data);
         console.log('Selected subjects with topics:', response.data.selected_subjects_with_topics);
         setIsQuestionnaireCompleted(true);
-        
+
         // Scroll to progress bar after questionnaire completion
         setTimeout(() => {
           const progressBarSection = document.getElementById('progress-bar-section');
           if (progressBarSection) {
-            progressBarSection.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'center' 
+            progressBarSection.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
             });
           }
         }, 500);
@@ -263,135 +266,120 @@ const App: React.FC = () => {
 
   return (
     <>
-      {/* DotGrid as full background */}
       <div>
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '140vw',
-          height: '140vh',
-          zIndex: 3,
-          pointerEvents: 'none',
-        }}
-      >
-        <DotGrid
-          dotSize={8}
-          gap={100}
-          baseColor="#e27100"
-          activeColor="#ffd246"
-          proximity={120}
-          shockRadius={500}
-          shockStrength={5}
-          resistance={5000}
-          returnDuration={2.5}
-        />
-      </div>
-
-      {/* Main content above the grid */}
-      <div style={{ position: 'relative', zIndex: 4 }}>
-        <Header />
-
         <div
           style={{
-            width: '70vw',
-            maxWidth: '1200px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '24px',
-            margin: '40px auto',
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '140vw',
+            height: '140vh',
+            zIndex: 3,
+            pointerEvents: 'none',
           }}
         >
-          <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(226, 113, 0 , 0.2)">
-            <GradientText animationSpeed={10}>
-            Connect your AI Assistant to your cloud
-            </GradientText>
-          </SpotlightCard>
-
-          <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(226, 113, 0 , 0.2)">
-          <GradientText animationSpeed={10}>
-            Get help from the internet
-          </GradientText>
-          </SpotlightCard>
-
-          <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(226, 113, 0 , 0.2)">
-            <GradientText animationSpeed={10}>
-            Complete your tasks efficiently
-            </GradientText>
-          </SpotlightCard>
+          <DotGrid
+            dotSize={8}
+            gap={100}
+            baseColor="#e27100"
+            activeColor="#ffd246"
+            proximity={120}
+            shockRadius={500}
+            shockStrength={5}
+            resistance={5000}
+            returnDuration={2.5}
+          />
         </div>
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            maxWidth: '900px',
-            margin: '0 auto',
-            padding: '16px 0 32px 0',
-            textAlign: 'center',
-            color: '#fff',
-            fontSize: '1.6rem',
-            letterSpacing: '0.01em',
-            lineHeight: 1.5,
-          }}
-        >
-          <div style={{
-            fontWeight: 900,
-            fontSize: '2.5rem',
-            color: '#e27100',
-            marginBottom: '10px',
-            letterSpacing: '0.03em',
-            textShadow: '0 2px 12px rgba(226,113,0,0.10)'
-          }}>
-            vortx.ai
-          </div>
-          <div style={{
-            fontWeight: 600,
-            fontSize: '1.5rem',
-            color: '#fff',
-            marginBottom: '18px'
-          }}>
-            Your intelligent assistant for learning and productivity.
-          </div>
-          <div style={{
-            fontSize: '1.2rem',
-            color: '#ffd246',
-            margin: '0 0 18px 0',
-            fontWeight: 500,
-            letterSpacing: '0.01em'
-          }}>
-            <span style={{ color: '#e27100', fontSize: '1.5rem', verticalAlign: 'middle' }}>•</span> Connect your cloud and favorite tools.<br />
-            <span style={{ color: '#e27100', fontSize: '1.5rem', verticalAlign: 'middle' }}>•</span> Get instant answers, visualizations, and smart suggestions.<br />
-            <span style={{ color: '#e27100', fontSize: '1.5rem', verticalAlign: 'middle' }}>•</span> Streamline your workflow with automation and seamless integration.
-          </div>
-          <div style={{
-            margin: '18px 0 0 0',
-            fontWeight: 700,
-            fontSize: '1.3rem',
-            color: '#ffd246',
-            letterSpacing: '0.01em',
-            textShadow: '0 2px 8px rgba(255,210,70,0.10)'
-          }}>
-            Unlock your potential with <span style={{ color: '#e27100' }}>adaptive AI</span> — all in one place.
-          </div>
-        </div>
-        
-        <div style={{ height: '600px', position: 'relative' }}>
-              <ChromaGrid 
-                color="orange"
-                radius={300}
-                damping={0.45}
-                fadeOut={0.6}
-                ease="power3.out"
-              />
-            </div>
 
-{/* Add separation line */}
-      <div id='stepper-section'
+        {/* Main content above the grid */}
+        <div style={{ position: 'relative', zIndex: 4 }}>
+          <Header />
+
+          <div
+            className="spotlight-cards"
+            style={{
+              width: '70vw',
+              maxWidth: '1200px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '24px',
+              margin: '40px auto',
+            }}
+          >
+            <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(226, 113, 0 , 0.2)">
+              <GradientText animationSpeed={10}>
+                Connect your AI Assistant to your cloud
+              </GradientText>
+            </SpotlightCard>
+
+            <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(226, 113, 0 , 0.2)">
+              <GradientText animationSpeed={10}>
+                Get help from the internet
+              </GradientText>
+            </SpotlightCard>
+
+            <SpotlightCard className="custom-spotlight-card" spotlightColor="rgba(226, 113, 0 , 0.2)">
+              <GradientText animationSpeed={10}>
+                Complete your tasks efficiently
+              </GradientText>
+            </SpotlightCard>
+          </div>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          maxWidth: '60vw',
+          margin: '0 auto',
+          padding: '0 0 100px 0',
+          textAlign: 'center',
+          color: '#fff',
+          fontSize: '1.2rem'
+        }}>
+          <h2>What is <Logo/> ?</h2>
+          <br />
+            <text fontSize='4rem'>
+              <Logo /> is an AI-powered assistant platform designed to help you connect your cloud, get help from the internet, and complete your tasks efficiently. Our mission is to streamline your workflow with intelligent automation and seamless integration. 
+            </text>
+            <br />
+          <button
+            style={{
+              marginTop: '32px',
+              padding: '12px 32px',
+              fontSize: '1.1rem',
+              background: 'linear-gradient(90deg, #e27100 0%, #ffd246 100%)',
+              color: '#222',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: 600,
+              boxShadow: '0 2px 12px rgba(226,113,0,0.12)'
+            }}
+            onClick={() => {
+              const divider = document.getElementById('stepper-section');
+              if (divider) {
+                const rect = divider.getBoundingClientRect();
+                // Scroll so the divider is at the very top of the viewport
+                window.scrollTo({
+                  top: rect.top - 64,
+                  behavior: 'smooth'
+                });
+              }
+            }}
+          >
+              <FontAwesomeIcon icon={faRocket} /> Launch Demo <FontAwesomeIcon icon={faRocket}/>
+          </button>
+        </div>
+          <ChromaGrid
+            color="orange"
+            radius={300}
+            damping={0.45}
+            fadeOut={0.6}
+            ease="power3.out"
+          />
+
+        <div id='stepper-section'
           style={{
             width: '100%',
             height: '2px',
@@ -402,7 +390,6 @@ const App: React.FC = () => {
           }}
         />
 
-        <div style={{ marginTop: 10 }}>
           <Stepper
             initialStep={1}
             onStepChange={(step) => {
@@ -411,12 +398,12 @@ const App: React.FC = () => {
             onFinalStepCompleted={() => {
               console.log("All steps completed!");
               submitQuestionnaireResults();
-              
+
               // Scroll to PageContainer after completing all steps
               setTimeout(() => {
                 const pageContainer = document.querySelector('#page-container');
                 if (pageContainer) {
-                  pageContainer.scrollIntoView({ 
+                  pageContainer.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                   });
@@ -470,86 +457,86 @@ const App: React.FC = () => {
                 </p>
               </div>
             </Step>
-            
+
             <Step>
               <h2>🎓 Education Level:</h2>
               <p>Hi there! Let's start by knowing where you are in your educational journey! 🚀</p>
               <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'column',
-        }}>
-        <AnimatedList
-          items={educationLevels.length > 0 ? educationLevels : [
-            '<strong>Middle School</strong> (Grades 6-8)',
-            '<strong>High School</strong> (Grades 9-12)', 
-            '<strong>College (Early)</strong> (Freshman & Sophomore)',
-            '<strong>College (Advanced)</strong> (Junior & Senior)',
-            '<strong>Graduate School</strong> (Master\'s & PhD)'
-            ]}
-          initialSelectedIndex={-1}
-          allowHtml={true}
-          onItemSelect={(item, index) => {
-            console.log('Selected education level:', item, 'at index:', index);
-            setSelectedEducationLevel({ item, index });
-          }}
-          />
-        </div>
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+              }}>
+                <AnimatedList
+                  items={educationLevels.length > 0 ? educationLevels : [
+                    '<strong>Middle School</strong> (Grades 6-8)',
+                    '<strong>High School</strong> (Grades 9-12)',
+                    '<strong>College (Early)</strong> (Freshman & Sophomore)',
+                    '<strong>College (Advanced)</strong> (Junior & Senior)',
+                    '<strong>Graduate School</strong> (Master\'s & PhD)'
+                  ]}
+                  initialSelectedIndex={-1}
+                  allowHtml={true}
+                  onItemSelect={(item, index) => {
+                    console.log('Selected education level:', item, 'at index:', index);
+                    setSelectedEducationLevel({ item, index });
+                  }}
+                />
+              </div>
             </Step>
-            
+
             <Step>
               <h2>📚 Subject Area:</h2>
-              <p>What subjects would you like to explore or improve? 🔍 <br/>
-              <small style={{color: '#ffd246'}}>Click to select multiple subjects</small></p>
+              <p>What subjects would you like to explore or improve? 🔍 <br />
+                <small style={{ color: '#ffd246' }}>Click to select multiple subjects</small></p>
               <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'column',
-        }}>
-        <AnimatedList
-          items={subjects.length > 0 ? subjects : [
-            'Mathematics 🧮 (Algebra, Geometry, Calculus, Statistics)',
-            'Physics ⚛️ (Mechanics, Electricity, Waves, Thermodynamics)',
-            'Chemistry 🧪 (Organic, Inorganic, Physical Chemistry)',
-            'Biology 🧬 (Genetics, Ecology, Anatomy, Cell Biology)',
-            'Computer Science 💻 (Programming, Algorithms, Data Structures)',
-            'History ⏳ (World History, US History, Ancient Civilizations)',
-            'Geography 🌍 (Physical Geography, Human Geography, Geopolitics)',
-            'Economics 💹 (Microeconomics, Macroeconomics, Personal Finance)',
-            'Psychology 🧠 (Cognitive, Social, Developmental)',
-            'Literature 📚 (American Literature, World Literature, Poetry)',
-            'English 🇺🇸 (Grammar, Writing, Literature)',
-            'Spanish 🇪🇸 (Conversation, Grammar, Culture)',
-            'French 🇫🇷 (Conversation, Grammar, Culture)',
-            'Other Languages 🌐 (German, Mandarin, Japanese)'
-            ]}
-          initialSelectedIndex={-1}
-          allowHtml={true}
-          multiSelect={true}
-          onMultiSelect={(selectedItems, selectedIndices) => {
-            console.log('Selected subjects:', selectedItems);
-            console.log('Selected indices:', selectedIndices);
-            updateAvailableTopics(selectedItems, selectedIndices);
-          }}
-          onItemSelect={(item, index) => {
-            console.log('Single selected subject:', item, 'at index:', index);
-          }}
-          />
-          <div
-            style={{
-              width: '100%',
-              height: '2px',
-              background: 'linear-gradient(60deg, #e27100 20%, #ffd246 100%)',
-              opacity: 0.7,
-              margin: '32px 0',
-              borderRadius: '1px',
-            }}
-          />
-        </div>
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+              }}>
+                <AnimatedList
+                  items={subjects.length > 0 ? subjects : [
+                    'Mathematics 🧮 (Algebra, Geometry, Calculus, Statistics)',
+                    'Physics ⚛️ (Mechanics, Electricity, Waves, Thermodynamics)',
+                    'Chemistry 🧪 (Organic, Inorganic, Physical Chemistry)',
+                    'Biology 🧬 (Genetics, Ecology, Anatomy, Cell Biology)',
+                    'Computer Science 💻 (Programming, Algorithms, Data Structures)',
+                    'History ⏳ (World History, US History, Ancient Civilizations)',
+                    'Geography 🌍 (Physical Geography, Human Geography, Geopolitics)',
+                    'Economics 💹 (Microeconomics, Macroeconomics, Personal Finance)',
+                    'Psychology 🧠 (Cognitive, Social, Developmental)',
+                    'Literature 📚 (American Literature, World Literature, Poetry)',
+                    'English 🇺🇸 (Grammar, Writing, Literature)',
+                    'Spanish 🇪🇸 (Conversation, Grammar, Culture)',
+                    'French 🇫🇷 (Conversation, Grammar, Culture)',
+                    'Other Languages 🌐 (German, Mandarin, Japanese)'
+                  ]}
+                  initialSelectedIndex={-1}
+                  allowHtml={true}
+                  multiSelect={true}
+                  onMultiSelect={(selectedItems, selectedIndices) => {
+                    console.log('Selected subjects:', selectedItems);
+                    console.log('Selected indices:', selectedIndices);
+                    updateAvailableTopics(selectedItems, selectedIndices);
+                  }}
+                  onItemSelect={(item, index) => {
+                    console.log('Single selected subject:', item, 'at index:', index);
+                  }}
+                />
+                <div
+                  style={{
+                    width: '100%',
+                    height: '2px',
+                    background: 'linear-gradient(60deg, #e27100 20%, #ffd246 100%)',
+                    opacity: 0.7,
+                    margin: '32px 0',
+                    borderRadius: '1px',
+                  }}
+                />
+              </div>
             </Step>
-            
+
             <Step>
               <h2>🎯 Specific Topics:</h2>
               <p>Now let's get specific! Which topics would you like to focus on? 📚</p>
@@ -597,14 +584,14 @@ const App: React.FC = () => {
                 </div>
               )}
             </Step>
-            
+
             <Step>
               <h2>👤 Tell us about yourself:</h2>
-              <input 
+              <input
                 type="text"
-                value={name} 
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)} 
-                placeholder="Your name?" 
+                value={name}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                placeholder="Your name?"
                 style={{
                   padding: '12px',
                   fontSize: '16px',
@@ -617,29 +604,25 @@ const App: React.FC = () => {
               />
             </Step>
           </Stepper>
-        </div>
 
-{/* Duolingo Progress Bar */}
-        <div id="progress-bar-section">
-          <DuolingoProgressBar 
+          <div style={{ height: '40px' }} />
+
+          <DuolingoProgressBar
             initialProgress={0}
             onProgressChange={(progress) => {
               console.log(`🎯 Progress updated: ${progress}%`);
             }}
           />
-        </div>
 
-        <div id="page-container">
-          <PageContainer 
+          <PageContainer
             userName={name}
             selectedSubjects={selectedSubjects}
             selectedTopics={selectedTopics}
           />
-        </div>
 
         {/* Talent Tree Section */}
         <div id="talent-tree-section" style={{
-          width: '100%',
+          width: '100wh',
           minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
@@ -651,7 +634,7 @@ const App: React.FC = () => {
           <div style={{
             textAlign: 'center',
             marginBottom: '40px',
-            zIndex: 5,
+            zIndex: 4,
             position: 'relative'
           }}>
             <h2 style={{
@@ -680,13 +663,14 @@ const App: React.FC = () => {
           <TalentTree />
         </div>
       </div>
+    </div >
     </>
   );
 };
 
+<GraphRenderer />
 export default App;
-          
-          {/* <GraphRenderer /> */}
+
 {/*           
           <div style={{ 
             maxWidth: '3000px',
@@ -737,7 +721,6 @@ export default App;
           
         </div> */}
 
-        <PageContainer></PageContainer>
 {/* 
           <ApiWorkflow
             inputText={inputText}
@@ -746,8 +729,8 @@ export default App;
             processText={processText}
             error={error}
           /> */}
-          
-          {/* <GraphRenderer /> */}
+
+{/* <GraphRenderer /> */ }
 {/*           
           <div style={{ 
             maxWidth: '3000px',

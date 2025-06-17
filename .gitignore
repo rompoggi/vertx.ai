@@ -1,4 +1,6 @@
 ## Core latex/pdflatex auxiliary files:
+backend/env
+
 *.aux
 *.lof
 *.log
@@ -309,5 +311,5 @@ backend/venv
 backend/source
 backend/api/tools/storage/api_key.txt
 backend/api/tools/api_key.txt
+backend/api/.DS_Store
 /backend/env
-/backend/env/*

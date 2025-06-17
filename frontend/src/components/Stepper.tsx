@@ -11,32 +11,33 @@ import React, {
 const stepperStyles = `
 .outer-container {
     // display: flex;
-    min-height: 100%;
+    min-height: 600px;
+    height: auto;
     flex: 1 1 0%;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding-top: 1rem;
 }
+// @media (min-width: 640px) {
+//     .outer-container {
+//         aspect-ratio: 4 / 3;
+//     }
+// }
 
-@media (min-width: 640px) {
-    .outer-container {
-        aspect-ratio: 4 / 3;
-    }
-}
-
-@media (min-width: 768px) {
-    .outer-container {
-        aspect-ratio: 2 / 1;
-    }
-}
+// @media (min-width: 768px) {
+//     .outer-container {
+//         aspect-ratio: 2 / 1;
+//     }
+// }
 
 .step-circle-container {
     margin-left: auto;
     margin-right: auto;
-    width: 100%;
-    max-width: 48rem;
-    height: 700px; /* Fixed height instead of min-height */
+    width: 80vw;
+    max-width: 40wh;
+    min-height: 600px; /* Or whatever minimum you want */
+    // height: 600px;
     background: rgba(0, 0, 0, 0.65);
     border-radius: 2rem; /* Uniform border radius for all corners */
     box-shadow: 0px 0px 6px 6px rgba(184, 129, 1, 0.10),
@@ -49,7 +50,7 @@ const stepperStyles = `
     display: flex;
     width: 100%;
     align-items: center;
-    padding: 2rem;
+    padding: 2rem 2rem 0 2rem;
 }
 
 .step-content-default {
@@ -101,22 +102,23 @@ const stepperStyles = `
 }
 
 .back-button {
-    transition: all 300ms ease;
+   transition: all 300ms ease;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    background: rgba(115, 63, 16, 0.8);
-    border: 2px solid rgba(255, 210, 70, 0.3);
-    color: #fffac2;
-    font-weight: 600;
+    background: linear-gradient(65deg, #ffd246 0%, #e27100 100%);
+    border: none;
+    color: #1a1000;
+    font-weight: 700;
     font-size: 14px;
     letter-spacing: -0.025em;
-    padding: 12px 24px;
+    padding: 12px 28px;
     cursor: pointer;
-    min-width: 100px;
+    min-width: 120px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 15px rgba(226, 113, 0, 0.4);
 }
 
 .back-button:before {
@@ -135,11 +137,10 @@ const stepperStyles = `
 }
 
 .back-button:hover {
-    background: rgba(115, 63, 16, 1);
-    border-color: rgba(255, 210, 70, 0.6);
-    color: #ffd246;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(226, 113, 0, 0.3);
+    background: linear-gradient(135deg, #ffd246 0%, #ffed4e 100%);
+    color: #2d1600;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(226, 113, 0, 0.5);
 }
 
 .back-button:active {
@@ -238,8 +239,26 @@ const stepperStyles = `
     height: 0.125rem;
     flex: 1;
     overflow: hidden;
-    border-radius: 0.25rem;
-    background-color: rgba(226, 113, 0, 0.5);
+
+  background: linear-gradient(90deg, #E27100 0%, #FFD246 50%, #E27100 100%);
+  background-size: 200% 100%;
+  background-position: 0% 0%;
+  animation: flow-line 2s linear infinite;
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes flow-line {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: -100% 0%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
 }
 
 .step-connector-inner {
@@ -479,7 +498,7 @@ const stepperStyles = `
   
   const stepVariants: Variants = {
     enter: (dir: number) => ({
-      x: dir >= 0 ? "-100%" : "100%",
+      x: dir >= 0 ? "100%" : "-100%",
       opacity: 0,
     }),
     center: {
@@ -487,7 +506,7 @@ const stepperStyles = `
       opacity: 1,
     },
     exit: (dir: number) => ({
-      x: dir >= 0 ? "50%" : "-50%",
+      x: dir >= 0 ? "-50%" : "50%",
       opacity: 0,
     }),
   };
@@ -559,14 +578,14 @@ const stepperStyles = `
   
   function StepConnector({ isComplete }: StepConnectorProps) {
     const lineVariants: Variants = {
-      incomplete: { width: 0, backgroundColor: "transparent" },
-      complete: { width: "100%", backgroundColor: "#efb603" },
+      // incomplete: { width: 0, backgroundColor: "transparent" },
+      // complete: { width: "100%", backgroundColor: "#efb603" },
     };
   
     return (
       <div className="step-connector">
         <motion.div
-          className="step-connector-inner"
+          className="step-connector"
           variants={lineVariants}
           initial={false}
           animate={isComplete ? "complete" : "incomplete"}

@@ -165,7 +165,7 @@ const GraphRenderer: React.FC<GraphRendererProps> = ({ className = '' }) => {
       setError(null);
       
       const response = await axios.post('http://localhost:8000/api/plot', {
-        function: functionString,
+        text: functionString,
         xMin: xMin,
         xMax: xMax
       });

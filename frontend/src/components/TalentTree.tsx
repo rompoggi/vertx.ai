@@ -839,9 +839,9 @@ const TalentTree: React.FC = () => {
             return (
               <motion.line
                 key={`connection-${index}`}
-                x1={500 + fromPos.x}
+                x1={525 + fromPos.x}
                 y1={400 + fromPos.y}
-                x2={500 + toPos.x}
+                x2={525 + toPos.x}
                 y2={400 + toPos.y}
                 stroke={selectedSubjectData?.color || '#ffffff'}
                 strokeWidth={isFromActivated && isToActivated ? "3" : isAvailable ? "2" : "1"}
@@ -957,7 +957,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: '100vh',
+    minHeight: '90vh',
     padding: '20px',
     position: 'relative',
     zIndex: 3,
