@@ -315,3 +315,4 @@ backend/api/.DS_Store
 /backend/env
 frontend/package.json
 frontend/package.json
+backend/.env

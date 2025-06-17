@@ -8,7 +8,10 @@ vortx.ai is an AI-powered assistant platform designed to help you connect your c
 - **Modern UI**: Built with React and TypeScript for a beautiful, responsive user experience.
 - **Backend**: Python Flask API for agent logic, media generation, and real-time updates.
 
-<img src="example_image.png" width="600" alt="Main Interface">
+<div style="display: flex">
+    <img src="resources/frontpage.png" width="50%" aspect-ratio="1" alt="Main Interface">
+    <img src="resources/learningpage.png" width="50%" aspect-ratio="1" alt="Main Interface">
+</div>
 
 ## Project Structure
 
@@ -64,7 +67,7 @@ vortx.ai is an adaptive AI-powered assistant designed to enhance learning, conte
 
 ## Workflow Overview
 
-<img src="agent_workflow.png" width="600" alt="Main Interface">
+<img src="resources/agent_workflow.png" width="600" alt="Main Interface">
 
 
 #### Starting Point:
