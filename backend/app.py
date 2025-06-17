@@ -1,8 +1,7 @@
-from flask import Flask, send_from_directory
+from flask import Flask
 from flask_cors import CORS
 from config import Config
 from api.routes import api
-import os
 
 def create_app(config_class=Config):
     app = Flask(__name__, static_folder='static')
@@ -15,7 +14,7 @@ def create_app(config_class=Config):
     app.register_blueprint(api, url_prefix='/api')
     
     # Ensure static/graphs directory exists
-    os.makedirs(os.path.join(app.static_folder, 'graphs'), exist_ok=True)
+    # os.makedirs(os.path.join(app.static_folder, 'graphs'), exist_ok=True)
     
     return app
 

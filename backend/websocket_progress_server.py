@@ -236,7 +236,7 @@ def index():
     return {
         'status': 'Serveur WebSocket Duolingo actif',
         'connected_users': len(user_progress),
-        'endpoint': 'ws://localhost:5000',
+        'endpoint': 'ws://localhost:8001',
         'frontend_url': 'http://localhost:3000'
     }
 
@@ -267,15 +267,15 @@ def get_stats():
 
 if __name__ == '__main__':
     print('🚀 Démarrage du serveur WebSocket Duolingo...')
-    print('📡 Backend accessible sur: http://localhost:5000')
+    print('📡 Backend accessible sur: http://localhost:8001')
     print('🌐 Frontend à connecter sur: http://localhost:3000')
-    print('📊 Statistiques disponibles sur: http://localhost:5000/stats')
+    print('📊 Statistiques disponibles sur: http://localhost:8001/stats')
     
     # Démarrer le serveur avec support WebSocket
     socketio.run(
         app, 
         host='0.0.0.0', 
-        port=5000, 
+        port=8001, 
         debug=True,
         allow_unsafe_werkzeug=True
     )
