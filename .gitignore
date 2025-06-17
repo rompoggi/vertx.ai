@@ -313,3 +313,5 @@ backend/api/tools/storage/api_key.txt
 backend/api/tools/api_key.txt
 backend/api/.DS_Store
 /backend/env
+frontend/package.json
+frontend/package.json
