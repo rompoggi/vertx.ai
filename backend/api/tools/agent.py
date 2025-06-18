@@ -26,15 +26,6 @@ if api_key == "":  # api_key should be globally defined TODO
 def define_models() -> dict:
     return None
 
-
-def log(message: str):
-   with open("log.txt", "a") as f:
-      f.write(message + "\n")
-
-def log(message: str):
-   with open("log.txt", "a") as f:
-      f.write(message + "\n")
-
 def log(message: str):
    with open("log.txt", "a") as f:
       f.write(message + "\n")
@@ -48,8 +39,6 @@ class Agent:
   def init(self, fixed_questions):
     self.fixed_questions = fixed_questions
     define_models(self)
-    with open("log.txt", "w") as f:
-       f.write(f"Agent initializated with fixed questions: {fixed_questions}.\n")
 
     # Add fixed questions as initial context
     fixed_context = []
