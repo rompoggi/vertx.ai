@@ -2,11 +2,11 @@
 from flask import Flask
 from flask_cors import CORS
 from api.routes import api
-import os
+from os import path, getenv
 import dotenv
 
 dotenv.load_dotenv()
-api_key: str = os.getenv("API_KEY", "")
+api_key: str = getenv("API_KEY", "")
 if api_key == "":  # api_key should be globally defined TODO
     try:
         with open(

@@ -100,9 +100,8 @@ class Agent:
 
         # context[-1]["content"] = "### ORIGINAL USER PROMPT ###\n" + context[-1]["content"] + "\n### SYSTEM PROMPT ###\n" + "Do not talk to the user. Your output will be the prompt of another AI agent. You have to analyze all the context that is given to you and reduce it to a single string. This string should contain the most important information that the user has given you, and that you have given to the user. It should be a summary of the conversation, and it should be short while still being informative. The context you produce will be the prompt to another ageint, so it should contain all the relevant information about the user's state and the conversation history. Most importantly, you should take a lot of care about whether the user would be interested in a course explanation or a question to verify their understanding. Do include as much information as possible about the user's state for example."
         manager = self.models["manager"]
-        prompt_manager = self.models["context_to_prompt"].generate(context).content
         
-        answer = manager.run(prompt_manager + "\n\n### SYSTEM PROMPT ###\n Your  task is to analyze the context and decide which agent to use. If you think the user needs help with the course, ask course_agent to give you a paragraph about a specific topic you will ask it about, and return it. If you think it would be good for the user to confirm their knowledge, ask question_agent to ask a question about the course. Return an answer after a single tool use, so that your returned answer is of the form '{\"balise\": agent_used_type (cours or question), \"text\": content_to_return}'. If you don't want to return anything since the answers you are do not meet your quality standards, you may decide to return nothing, in this case, use the \"nothing\" balise. If an agent returns an answer you deem unwanted or unnecessary, or it does not meet your quality standards, you may decide to try again, ask another agent or, and it should sometimes be preferred, return nothing.")
+        answer = manager.run(context + "\n\n### SYSTEM PROMPT ###\n Your  task is to analyze the context and decide which agent to use. If you think the user needs help with the course, ask course_agent to give you a paragraph about a specific topic you will ask it about, and return it. If you think it would be good for the user to confirm their knowledge, ask question_agent to ask a question about the course. Return an answer after a single tool use, so that your returned answer is of the form '{\"balise\": agent_used_type (cours or question), \"text\": content_to_return}'. If you don't want to return anything since the answers you are do not meet your quality standards, you may decide to return nothing, in this case, use the \"nothing\" balise. If an agent returns an answer you deem unwanted or unnecessary, or it does not meet your quality standards, you may decide to try again, ask another agent or, and it should sometimes be preferred, return nothing.")
         print(answer)
         # Returns a {"text":..., "balise":...}
         return answer
@@ -132,13 +131,6 @@ def define_models(agent) -> dict:
     #       api_key = f.read().strip()
     #   except:
     #     print("No file 'storage/api_key.txt', please create such a file (soon deprecated) or create a .env in /backend folder and add a '.env' file.")
-
-    models["context_to_prompt"] = LiteLLMModel(
-        model_id="claude-3-5-haiku-latest",
-        api_key=api_key,
-        temperature=0.2,
-        max_tokens=5000,
-    )
 
     models["course"] = CodeAgent(
         model=LiteLLMModel(
@@ -236,8 +228,8 @@ Output Instructions:
 def translate_json(body: list[dict]) -> list[dict]:
     # Gets dict, ordonned by keys and put into list
     translated = []
-    for k in sorted(body.keys()):
-       translated.append({"balise": body[k]["balise"] if body[k]["balise"] != "default" else "user", "content": body[k]["content"]})
+    for k in body:
+       translated.append({"balise": k["balise"] if k["balise"] != "default" else "user", "content": k["text"]})
     return translated
 
 
