@@ -48,7 +48,7 @@ class Agent:
       # Add the answer as user message
       fixed_context.append({"role": "user", "content": fq["answer"]})
     self.fixed_context = fixed_context
-
+    
     with open("log.txt", "w") as f:
        f.write(f"Agent initializated with fixed questions: {fixed_questions}.\n")
 
@@ -81,8 +81,35 @@ class Agent:
         return self.forward_question(context)
   
   def forward_question(self, context: str) -> list[dict]:
-     question_returned = question_agent(context)
-     return [{"balise": "question", "text": question_returned.content}]
+    prompt = """
+    ### SYSTEM PROMPT ###
+    Role: You're a tutor AI determining if enough context has been gathered to begin teaching and writing courses for the student.
+    Rules:
+    1. Analyze ONLY the conversation history below
+    2. If essential teaching context is present (subject, level, etc..):
+    - Output EXACTLY: [%QE%]
+    - Do not be strict, but ensure the context is sufficient to start teaching
+    3. If a CRITICAL and ESSENTIAL information is missing:
+    - Output ONE question to gather the MOST URGENT missing information
+    - Phrase it as a SINGLE question only (no prefixes/suffixes)
+
+    Conversation History CONSIDER THE FOLLOWING ONLY, IMPORTANT:
+    ### CONVERSATION HISTORY ###
+{history}
+
+    ### SYSTEM PROMPT ###
+    Output Instructions:
+    - RETURN ONLY the following 6 characters tag: [%QE%] or return a single question
+    - NO explanations, NO markdown, NO apologies
+    - Example valid outputs:
+        -`[%QE%]`
+        -`What specific topic in algebra do you need help with?`
+        -`Are you interested in numerical methods or theoretical aspects of Markov Chains?`
+    """
+    prompt = str(prompt.format(history=context))
+    answer = self.models["initial_questions"](messages=[{"role": "user", "content": prompt}], max_tokens=1000).content
+    log("Returned answer from initial questions model:\n" + answer)
+    return [{"balise": "question", "text": answer}]
 
   def forward_manager(self, context: str) -> list[dict]:
         """
@@ -99,10 +126,9 @@ class Agent:
         # Changed method of context building to just striify context 
 
         # context[-1]["content"] = "### ORIGINAL USER PROMPT ###\n" + context[-1]["content"] + "\n### SYSTEM PROMPT ###\n" + "Do not talk to the user. Your output will be the prompt of another AI agent. You have to analyze all the context that is given to you and reduce it to a single string. This string should contain the most important information that the user has given you, and that you have given to the user. It should be a summary of the conversation, and it should be short while still being informative. The context you produce will be the prompt to another ageint, so it should contain all the relevant information about the user's state and the conversation history. Most importantly, you should take a lot of care about whether the user would be interested in a course explanation or a question to verify their understanding. Do include as much information as possible about the user's state for example."
-        manager = self.models["manager"]
         
-        answer = manager.run(context + "\n\n### SYSTEM PROMPT ###\n Your  task is to analyze the context and decide which agent to use. If you think the user needs help with the course, ask course_agent to give you a paragraph about a specific topic you will ask it about, and return it. If you think it would be good for the user to confirm their knowledge, ask question_agent to ask a question about the course. Return an answer after a single tool use, so that your returned answer is of the form '{\"balise\": agent_used_type (cours or question), \"text\": content_to_return}'. If you don't want to return anything since the answers you are do not meet your quality standards, you may decide to return nothing, in this case, use the \"nothing\" balise. If an agent returns an answer you deem unwanted or unnecessary, or it does not meet your quality standards, you may decide to try again, ask another agent or, and it should sometimes be preferred, return nothing.")
-        print(answer)
+        answer = self.models["manager"].run(context + "\n\n### SYSTEM PROMPT ###\n Your  task is to analyze the context and decide which agent to use. If you think the user needs help with the course, ask course_agent to give you a paragraph about a specific topic you will ask it about, and return it. If you think it would be good for the user to confirm their knowledge, ask question_agent to ask a question about the course. Return an answer after a single tool use, so that your returned answer is of the form '{\"balise\": agent_used_type (cours or question), \"text\": content_to_return}'. If you don't want to return anything since the answers you are do not meet your quality standards, you may decide to return nothing, in this case, use the \"nothing\" balise. If an agent returns an answer you deem unwanted or unnecessary, or it does not meet your quality standards, you may decide to try again, ask another agent or, and it should sometimes be preferred, return nothing.")
+        log("Manager answer:\n" + str(answer))
         # Returns a {"text":..., "balise":...}
         return answer
   
@@ -114,9 +140,8 @@ agent = Agent()
 
 def init_agent(fixed_questions: list[dict]):
     """Initialize the agent with fixed questions from the questionnaire"""
+    log("Initializing agent with fixed questions from init_agent.")
     agent.init(fixed_questions)
-    if DEBUG:
-        print("Agent initialized with fixed questions:", fixed_questions)
 
 
 def run_agent(body: list[dict]) -> list[dict]:
@@ -132,9 +157,11 @@ def define_models(agent) -> dict:
     #   except:
     #     print("No file 'storage/api_key.txt', please create such a file (soon deprecated) or create a .env in /backend folder and add a '.env' file.")
 
+    pretty_strong_name = "claude-sonnet-4-20250514"  # This is the model name we will use
+
     models["course"] = CodeAgent(
         model=LiteLLMModel(
-            model_id="claude-sonnet-4-20250514",
+            model_id=pretty_strong_name,
             api_key=api_key,
             temperature=0.2,
             max_tokens=2000,
@@ -147,7 +174,7 @@ def define_models(agent) -> dict:
 
     models["question"] = CodeAgent(
         model=LiteLLMModel(
-            model_id="claude-sonnet-4-20250514",
+            model_id=pretty_strong_name,
             api_key=api_key,
             temperature=0.2,
             max_tokens=2000,
@@ -160,7 +187,7 @@ def define_models(agent) -> dict:
 
     models["manager"] = CodeAgent(
         model=LiteLLMModel(
-            model_id="claude-sonnet-4-20250514",
+            model_id=pretty_strong_name,
             api_key=api_key,
             temperature=0.1,
             max_tokens=300,
@@ -172,57 +199,13 @@ def define_models(agent) -> dict:
         max_steps=5,
     )
 
-    agent.models = models
-
-
-def question_agent(context: str) -> str:
-    """
-    determines if enough inital questions have been asked to start the conversation, if not, it will ask the user a question
-    """
-    # actual file is in "storage/"
-    # if (api_key == ""): # api_key should be globally defined TODO
-    #   try:
-    #     with open(path.join(path.dirname(__file__), "storage", "api_key.txt"), "r") as f:
-    #       api_key = f.read().strip()
-    #   except:
-    #     print("No file 'storage/api_key.txt', please create such a file (soon deprecated) or create a .env in /backend folder and add a '.env' file.")
-
-    # with open(path.join(path.dirname(__file__), "storage", "api_key.txt"), "r") as f: api_key = f.read().strip()
-    model = LiteLLMModel(
-        model_id="anthropic/claude-opus-4-20250514",
+    models["initial_questions"] = LiteLLMModel(
+        model_id=pretty_strong_name,
         temperature=0.3,
         api_key=api_key,  # in practice we would not hardcode the API key, but use an environment variable or a secure vault service
     )
 
-    prompt = """
-  ### SYSTEM PROMPT ###
-Role: You're a tutor AI determining if enough context has been gathered to begin teaching and writing courses for the student.
-Rules:
-1. Analyze ONLY the conversation history below
-2. If essential teaching context is present (subject, level, etc..):
-   - Output EXACTLY: [%QE%]
-   - Do not be strict, but ensure the context is sufficient to start teaching
-3. If a CRITICAL and ESSENTIAL information is missing:
-   - Output ONE question to gather the MOST URGENT missing information
-   - Phrase it as a SINGLE question only (no prefixes/suffixes)
-
-Conversation History CONSIDER THE FOLLOWING ONLY, IMPORTANT:
-### CONVERSATION HISTORY ###
-{history}
-
-### SYSTEM PROMPT ###
-Output Instructions:
-- RETURN ONLY the following 6 characters tag: [%QE%] or return a single question
-- NO explanations, NO markdown, NO apologies
-- Example valid outputs:
-    -`[%QE%]`
-    -`What specific topic in algebra do you need help with?`
-    -`Are you interested in numerical methods or theoretical aspects of Markov Chains?`
-"""
-    prompt = str(prompt.format(history=context))
-    return model(
-        messages=[{"role": "user", "content": prompt}], max_tokens=1000
-    ).content
+    agent.models = models
 
 
 def translate_json(body: list[dict]) -> list[dict]:
