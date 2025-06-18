@@ -35,6 +35,7 @@ class Agent:
   fixed_context: list[dict] = None
   models: dict = None
   initialized: bool = False
+  questioning_ended: bool = False
 
   def init(self, fixed_questions):
     self.fixed_questions = fixed_questions
@@ -48,12 +49,11 @@ class Agent:
       # Add the answer as user message
       fixed_context.append({"role": "user", "content": fq["answer"]})
     self.fixed_context = fixed_context
-    
+    self.initialized = True
     with open("log.txt", "w") as f:
        f.write(f"Agent initializated with fixed questions: {fixed_questions}.\n")
 
   def forward(self, body: list[dict]) -> list[dict]:
-     # if "[%QE%]" is somewhere in the body, forward to manager, otherwise forward to question
      # Input is of form  [{"balise": "question", "content": "some text"}]
      # Output is of form [{"balise": "question", "text": "some text"}]
 
@@ -73,12 +73,12 @@ class Agent:
 
      log(f"\nContext built:\n {context}")
 
-     if "[%QE%]" in context:
-        log("Forwarding to manager due to [%QE%] in body.")
-        return self.forward_manager(context)
-     else:
+     if self.questioning_ended:
         log("Forwarding to question agent.")
         return self.forward_question(context)
+     else:
+        log("Forwarding to manager due to questioning_ended flag being true.")
+        return self.forward_manager(context)
   
   def forward_question(self, context: str) -> list[dict]:
     prompt = """
@@ -109,7 +109,12 @@ class Agent:
     prompt = str(prompt.format(history=context))
     answer = self.models["initial_questions"](messages=[{"role": "user", "content": prompt}], max_tokens=1000).content
     log("Returned answer from initial questions model:\n" + answer)
-    return [{"balise": "question", "text": answer}]
+    if not "[%QE%]" in answer:
+        return [{"balise": "question", "text": answer}]
+    else:
+        log("Context is sufficient to start teaching, transferring to manager.")
+        self.questioning_ended = True
+        return self.forward_manager(context)
 
   def forward_manager(self, context: str) -> list[dict]:
         """
