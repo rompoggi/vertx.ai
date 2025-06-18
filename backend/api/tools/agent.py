@@ -1,5 +1,5 @@
 # /usr/bin/python3
-from smolagents import CodeAgent, LiteLLMModel, WebSearchTool
+from smolagents import CodeAgent, LiteLLMModel, WebSearchTool, MultiStepAgent
 from .context_building import build_context
 import os
 from os import path
@@ -21,10 +21,6 @@ if api_key == "":  # api_key should be globally defined TODO
         print(
             "No file 'storage/api_key.txt', please create such a file (soon deprecated) or create a .env in /backend folder and add a '.env' file."
         )
-
-
-def define_models() -> dict:
-    return None
 
 def log(message: str):
    with open("log.txt", "a") as f:
@@ -74,11 +70,12 @@ class Agent:
      log(f"\nContext built:\n {context}")
 
      if self.questioning_ended:
-        log("Forwarding to question agent.")
-        return self.forward_question(context)
-     else:
         log("Forwarding to manager due to questioning_ended flag being true.")
         return self.forward_manager(context)
+     else:
+        log("Forwarding to question agent.")
+        return self.forward_question(context)
+        
   
   def forward_question(self, context: str) -> list[dict]:
     prompt = """
@@ -110,7 +107,7 @@ class Agent:
     answer = self.models["initial_questions"](messages=[{"role": "user", "content": prompt}], max_tokens=1000).content
     log("Returned answer from initial questions model:\n" + answer)
     if not "[%QE%]" in answer:
-        return [{"balise": "question", "text": answer}]
+        return {"balise": "question", "text": answer}
     else:
         log("Context is sufficient to start teaching, transferring to manager.")
         self.questioning_ended = True
@@ -132,7 +129,7 @@ class Agent:
 
         # context[-1]["content"] = "### ORIGINAL USER PROMPT ###\n" + context[-1]["content"] + "\n### SYSTEM PROMPT ###\n" + "Do not talk to the user. Your output will be the prompt of another AI agent. You have to analyze all the context that is given to you and reduce it to a single string. This string should contain the most important information that the user has given you, and that you have given to the user. It should be a summary of the conversation, and it should be short while still being informative. The context you produce will be the prompt to another ageint, so it should contain all the relevant information about the user's state and the conversation history. Most importantly, you should take a lot of care about whether the user would be interested in a course explanation or a question to verify their understanding. Do include as much information as possible about the user's state for example."
         
-        answer = self.models["manager"].run(context + "\n\n### SYSTEM PROMPT ###\n Your  task is to analyze the context and decide which agent to use. If you think the user needs help with the course, ask course_agent to give you a paragraph about a specific topic you will ask it about, and return it. If you think it would be good for the user to confirm their knowledge, ask question_agent to ask a question about the course. Return an answer after a single tool use, so that your returned answer is of the form '{\"balise\": agent_used_type (cours or question), \"text\": content_to_return}'. If you don't want to return anything since the answers you are do not meet your quality standards, you may decide to return nothing, in this case, use the \"nothing\" balise. If an agent returns an answer you deem unwanted or unnecessary, or it does not meet your quality standards, you may decide to try again, ask another agent or, and it should sometimes be preferred, return nothing.")
+        answer = self.models["manager"].run(context + "\n\n### SYSTEM PROMPT ###\n Your  task is to analyze the context and decide which agent to use. If you think the user needs help with the course, ask course_agent to give you a paragraph about a specific topic you will ask it about, and return it. If you think it would be good for the user to confirm their knowledge, ask question_agent to ask a question about the course. Return an answer after a single tool use, so that your returned answer is a dict of the form '{\"balise\": agent_used_type (cours or question), \"text\": content_to_return}'. To do so and not make a typo, write a python program that writes this dict. If you don't want to return anything since the answers you are do not meet your quality standards, you may decide to return nothing, in this case, use the \"nothing\" balise. If an agent returns an answer you deem unwanted or unnecessary, or it does not meet your quality standards, you may decide to try again, ask another agent or, and it should sometimes be preferred, return nothing.")
         log("Manager answer:\n" + str(answer))
         # Returns a {"text":..., "balise":...}
         return answer
@@ -164,7 +161,7 @@ def define_models(agent) -> dict:
 
     pretty_strong_name = "claude-sonnet-4-20250514"  # This is the model name we will use
 
-    models["course"] = CodeAgent(
+    models["course"] = MultiStepAgent(
         model=LiteLLMModel(
             model_id=pretty_strong_name,
             api_key=api_key,
@@ -177,12 +174,14 @@ def define_models(agent) -> dict:
         max_steps=3,
     )
 
-    models["question"] = CodeAgent(
+    models
+
+    models["question"] = MultiStepAgent(
         model=LiteLLMModel(
             model_id=pretty_strong_name,
             api_key=api_key,
             temperature=0.2,
-            max_tokens=2000,
+            max_tokens=1000,
         ),
         name="question_agent",
         description="This Agent is responsible for asking questions to the user to verify the users understanding of the course. When the user seems to have understood the course, the question_agent will ask questions to verify the user's understanding. If the user seems to be stuck on some specific content, the question_agent will ask questions to help the user understand the concept he is lacking. The question_agent is also used to ask questions about the user's understanding of the course, such as 'Do you feel like you completely understand what a Markov Chain is?' or 'Do you know the principle behind Young's double-slit experiment?'. \n### PROMPTING METHOD ###\nAsk the question agent to NOT complain, NOT ask for more information on its task, NOT answer as a chatbot. The question agent SHOULD answer a SINGLE question. It should only use web search if it cannot come up with any question by itself or make sure he is right about a complex question. It can think about a full problem but should output ONE SINGLE question of this problem; as you may decide to ask the agent for the follow-up questions later.",
@@ -195,7 +194,7 @@ def define_models(agent) -> dict:
             model_id=pretty_strong_name,
             api_key=api_key,
             temperature=0.1,
-            max_tokens=300,
+            max_tokens=3000,
         ),
         managed_agents=[models["course"], models["question"]],
         name="manager_agent",
