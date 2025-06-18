@@ -31,6 +31,10 @@ def log(message: str):
    with open("log.txt", "a") as f:
       f.write(message + "\n")
 
+def log(message: str):
+   with open("log.txt", "a") as f:
+      f.write(message + "\n")
+
 class Agent:
   fixed_questions: list[dict] = None
   fixed_context: list[dict] = None
@@ -40,6 +44,8 @@ class Agent:
   def init(self, fixed_questions):
     self.fixed_questions = fixed_questions
     define_models(self)
+    with open("log.txt", "w") as f:
+       f.write(f"Agent initializated with fixed questions: {fixed_questions}.\n")
 
     # Add fixed questions as initial context
     fixed_context = []
