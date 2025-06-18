@@ -300,7 +300,7 @@ This environment allows you to:
       setTextBlocks(newBlocks);
       // API call on save
       axios.post('http://localhost:8000/api/body', {
-        // axios.post('http://localhost:8000/api/demo', { // Send to demo since body does not work yet
+      // axios.post('http://localhost:8000/api/demo', { // Send to demo since body does not work yet
         id: idx,
         text: newBlocks[idx].text,
         balise: newBlocks[idx].balise || 'default'

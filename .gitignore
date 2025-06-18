@@ -316,3 +316,4 @@ backend/api/.DS_Store
 frontend/package.json
 frontend/package.json
 backend/.env
+backend/log.txt
