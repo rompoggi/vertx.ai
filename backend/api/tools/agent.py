@@ -161,7 +161,7 @@ def define_models(agent) -> dict:
 
     pretty_strong_name = "claude-sonnet-4-20250514"  # This is the model name we will use
 
-    models["course"] = MultiStepAgent(
+    models["course"] = CodeAgent(
         model=LiteLLMModel(
             model_id=pretty_strong_name,
             api_key=api_key,
@@ -174,9 +174,8 @@ def define_models(agent) -> dict:
         max_steps=3,
     )
 
-    models
 
-    models["question"] = MultiStepAgent(
+    models["question"] = CodeAgent(
         model=LiteLLMModel(
             model_id=pretty_strong_name,
             api_key=api_key,
