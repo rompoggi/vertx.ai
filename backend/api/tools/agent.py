@@ -35,6 +35,10 @@ def log(message: str):
    with open("log.txt", "a") as f:
       f.write(message + "\n")
 
+def log(message: str):
+   with open("log.txt", "a") as f:
+      f.write(message + "\n")
+
 class Agent:
   fixed_questions: list[dict] = None
   fixed_context: list[dict] = None
