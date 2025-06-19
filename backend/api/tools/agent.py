@@ -172,7 +172,27 @@ class CourseWritingTool(Tool):
       """.format(context=context, topic=topic)
       return models["course"].run(prompt) 
        
-          
+class QuestionWritingTool(Tool):
+   name = "question_writing_tool"
+   description = """This tool is responsible for asking questions to the user to verify the user's understanding of the course. When the user seems to have understood the course, the question_writing_tool will ask questions to verify the user's understanding. If the user seems to be stuck on some specific content, the question_writing_tool will ask questions to help the user understand the concept he is lacking. The question_writing_tool is also used to ask questions about the user's understanding of the course, such as 'Do you feel like you completely understand what a Markov Chain is?' or 'Do you know the principle behind Young's double-slit experiment?'. The question_writing_tool should only return a single question, and should not complain or ask for more information on its task."""
+
+   inputs = {
+      "context": {
+         "type": "string",
+         "description": "The context of the conversation, including the user's level of understanding, previous messages, and any relevant information the question_writing_tool could use. This context will be used to tailor the question to the user's needs.",
+         },
+      "topic": {
+         "type": "string",
+         "description": "The specific topic of the course to ask a question about, as a single point to ask about. For example, 'Transition matrices in Markov Chains' or 'The principle of Young's double-slit experiment'.",
+         }
+   }
+
+   output_type = "string"
+
+   def forward(self, context: str, topic: str) -> str:
+      prompt = """### SYSTEM PROMPT ###\nYou are a helpful agent that writes questions on various topics. You will be given a context of the conversation and a topic to ask a question about. Your task is to write a question about the topic, using the context to tailor your question to the user's needs.\n\n### CONTEXT ###\n{context}\n\n### TOPIC ###\n{topic}\n\n### SYSTEM PROMPT ###\nDo NOT complain, do NOT ask for more information on your task, and do NOT answer as a chatbot. You should write a question about a SINGLE topic. You should only use web search if you cannot come up with any question by yourself or make sure you are right about a complex point, otherwise, you HAVE to return in a single run. If necessary, can think about a full course but should only ask ONE SINGLE question about the course, as a single point; as follow up points can be discussed later.\n\n### OUTPUT FORMAT ###\nReturn a single question asking about the topic, using the context to tailor your question to the user's needs. Do not include any additional information or explanations, just the question.\n
+      """.format(context=context, topic=topic)
+      return models["question"].run(prompt)
 
 def define_models(agent) -> dict:
 
@@ -195,8 +215,6 @@ def define_models(agent) -> dict:
             temperature=0.2,
             max_tokens=1000,
         ),
-        name="question_agent",
-        description="This Agent is responsible for asking questions to the user to verify the users understanding of the course. When the user seems to have understood the course, the question_agent will ask questions to verify the user's understanding. If the user seems to be stuck on some specific content, the question_agent will ask questions to help the user understand the concept he is lacking. The question_agent is also used to ask questions about the user's understanding of the course, such as 'Do you feel like you completely understand what a Markov Chain is?' or 'Do you know the principle behind Young's double-slit experiment?'. \n### PROMPTING METHOD ###\nAsk the question agent to NOT complain, NOT ask for more information on its task, NOT answer as a chatbot. The question agent SHOULD answer a SINGLE question. It should only use web search if it cannot come up with any question by itself or make sure he is right about a complex question. It can think about a full problem but should output ONE SINGLE question of this problem; as you may decide to ask the agent for the follow-up questions later.",
         tools=[WebSearchTool()],
         max_steps=3,
     )
@@ -208,10 +226,9 @@ def define_models(agent) -> dict:
             temperature=0.1,
             max_tokens=3000,
         ),
-        managed_agents=[models["course"], models["question"]],
         name="manager_agent",
         description="This Agent is responsible for managing the conversation between the user and the course_agent and question_agent. It decides which agent to use based on the user's input and the context of the conversation. The manager_agent can also choose not to do anything if it believes it wouldn't help the user, or the user did not write enough to warrant an answer.",
-        tools=[],
+        tools=[CourseWritingTool(), QuestionWritingTool()],
         max_steps=5,
     )
 
