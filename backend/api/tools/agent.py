@@ -1,17 +1,16 @@
 # /usr/bin/python3
 from smolagents import CodeAgent, LiteLLMModel, WebSearchTool, Tool
 from .context_building import build_context
-import os
-from os import path
+from os import path, getenv
+import dotenv
+
 
 DEBUG = True
 MEDIUM_LLM = "claude-sonnet-4-20250514"
 
-import dotenv
-
 dotenv.load_dotenv()
 
-api_key: str = os.getenv("API_KEY", "")
+api_key: str = getenv("API_KEY", "")
 if api_key == "":  # api_key should be globally defined TODO
     try:
         with open(
@@ -23,63 +22,66 @@ if api_key == "":  # api_key should be globally defined TODO
             "No file 'storage/api_key.txt', please create such a file (soon deprecated) or create a .env in /backend folder and add a '.env' file."
         )
 
+
 def log(message: str):
-   with open("log.txt", "a") as f:
-      f.write(message + "\n")
+    with open("log.txt", "a") as f:
+        f.write(message + "\n")
+
 
 class Agent:
-  fixed_questions: list[dict] = None
-  fixed_context: list[dict] = None
-  models: dict = None
-  initialized: bool = False
-  questioning_ended: bool = False
+    fixed_questions: list[dict] = None
+    fixed_context: list[dict] = None
+    models: dict = None
+    initialized: bool = False
+    questioning_ended: bool = False
 
-  def init(self, fixed_questions):
-    self.fixed_questions = fixed_questions
-    define_models(self)
+    def init(self, fixed_questions):
+        self.fixed_questions = fixed_questions
+        define_models(self)
 
-    # Add fixed questions as initial context
-    fixed_context = []
-    for fq in self.fixed_questions:
-      # Add the question as assistant message
-      fixed_context.append({"role": "assistant", "content": fq["question"]})
-      # Add the answer as user message
-      fixed_context.append({"role": "user", "content": fq["answer"]})
-    self.fixed_context = fixed_context
-    self.initialized = True
-    with open("log.txt", "w") as f:
-       f.write(f"Agent initializated with fixed questions: {fixed_questions}.\n")
+        # Add fixed questions as initial context
+        fixed_context = []
+        for fq in self.fixed_questions:
+            # Add the question as assistant message
+            fixed_context.append({"role": "assistant", "content": fq["question"]})
+            # Add the answer as user message
+            fixed_context.append({"role": "user", "content": fq["answer"]})
+        self.fixed_context = fixed_context
+        self.initialized = True
+        with open("log.txt", "w") as f:
+            f.write(f"Agent initializated with fixed questions: {fixed_questions}.\n")
 
-  def forward(self, body: list[dict]) -> list[dict]:
-     # Input is of form  [{"balise": "question", "content": "some text"}]
-     # Output is of form [{"balise": "question", "text": "some text"}]
+    def forward(self, body: list[dict]) -> list[dict]:
+        # Input is of form  [{"balise": "question", "content": "some text"}]
+        # Output is of form [{"balise": "question", "text": "some text"}]
 
-     if not self.initialized:
-        self.init([])  # Initialize with empty fixed questions if not already initialized
-        log("Agent not initialized, initializing with empty fixed questions.")
+        if not self.initialized:
+            self.init(
+                []
+            )  # Initialize with empty fixed questions if not already initialized
+            log("Agent not initialized, initializing with empty fixed questions.")
 
-     if len(body) == 0:
-       return [{"balise": None, "text": None}]
+        if len(body) == 0:
+            return [{"balise": None, "text": None}]
 
-     log("Body:\n" + str(body))
+        log("Body:\n" + str(body))
 
-     translated_body = translate_json(body)
-     anthropified_body = anthropify_body(translated_body)
-     body_with_fixed_context = self.fixed_context + anthropified_body
-     context: str = self.stringify_context(body_with_fixed_context)
+        translated_body = translate_json(body)
+        anthropified_body = anthropify_body(translated_body)
+        body_with_fixed_context = self.fixed_context + anthropified_body
+        context: str = self.stringify_context(body_with_fixed_context)
 
-     log(f"\nContext built:\n {context}")
+        log(f"\nContext built:\n {context}")
 
-     if self.questioning_ended:
-        log("Forwarding to manager due to questioning_ended flag being true.")
-        return self.forward_manager(context)
-     else:
-        log("Forwarding to question agent.")
-        return self.forward_question(context)
-        
-  
-  def forward_question(self, context: str) -> list[dict]:
-    prompt = """
+        if self.questioning_ended:
+            log("Forwarding to manager due to questioning_ended flag being true.")
+            return self.forward_manager(context)
+        else:
+            log("Forwarding to question agent.")
+            return self.forward_question(context)
+
+    def forward_question(self, context: str) -> list[dict]:
+        prompt = """
     ### SYSTEM PROMPT ###
     Role: You're a tutor AI determining if enough context has been gathered to begin teaching and writing courses for the student.
     Rules:
@@ -104,17 +106,19 @@ class Agent:
         -`What specific topic in algebra do you need help with?`
         -`Are you interested in numerical methods or theoretical aspects of Markov Chains?`
     """
-    prompt = str(prompt.format(history=context))
-    answer = models["initial_questions"](messages=[{"role": "user", "content": prompt}], max_tokens=1000).content
-    log("Returned answer from initial questions model:\n" + answer)
-    if not "[%QE%]" in answer:
-        return {"balise": "question", "text": answer}
-    else:
-        log("Context is sufficient to start teaching, transferring to manager.")
-        self.questioning_ended = True
-        return self.forward_manager(context)
+        prompt = str(prompt.format(history=context))
+        answer = models["initial_questions"](
+            messages=[{"role": "user", "content": prompt}], max_tokens=1000
+        ).content
+        log("Returned answer from initial questions model:\n" + answer)
+        if "[%QE%]" not in answer:
+            return {"balise": "question", "text": answer}
+        else:
+            log("Context is sufficient to start teaching, transferring to manager.")
+            self.questioning_ended = True
+            return self.forward_manager(context)
 
-  def forward_manager(self, context: str) -> list[dict]:
+    def forward_manager(self, context: str) -> list[dict]:
         """
         Processes the input body and returns a response based on the agent's logic.
 
@@ -124,22 +128,29 @@ class Agent:
         Returns:
             list[dict]: The response generated by the agent.
         """
-      
+
         # Context is user/assistant alternating messages
-        # Changed method of context building to just striify context 
+        # Changed method of context building to just striify context
 
         # context[-1]["content"] = "### ORIGINAL USER PROMPT ###\n" + context[-1]["content"] + "\n### SYSTEM PROMPT ###\n" + "Do not talk to the user. Your output will be the prompt of another AI agent. You have to analyze all the context that is given to you and reduce it to a single string. This string should contain the most important information that the user has given you, and that you have given to the user. It should be a summary of the conversation, and it should be short while still being informative. The context you produce will be the prompt to another ageint, so it should contain all the relevant information about the user's state and the conversation history. Most importantly, you should take a lot of care about whether the user would be interested in a course explanation or a question to verify their understanding. Do include as much information as possible about the user's state for example."
-        
-        answer = models["manager"].run(context + "\n\n### SYSTEM PROMPT ###\n Your  task is to analyze the context and decide which agent to use. If you think the user needs help with the course, ask course_agent to give you a paragraph about a specific topic you will ask it about, and return it. If you think it would be good for the user to confirm their knowledge, ask question_agent to ask a question about the course. Return an answer after a single tool use, so that your returned answer is a dict of the form '{\"balise\": agent_used_type (cours or question), \"text\": content_to_return}'. To do so and not make a typo, write a python program that writes this dict. If you don't want to return anything since the answers you are do not meet your quality standards, you may decide to return nothing, in this case, use the \"nothing\" balise. If an agent returns an answer you deem unwanted or unnecessary, or it does not meet your quality standards, you may decide to try again, ask another agent or, and it should sometimes be preferred, return nothing.")
+
+        answer = models["manager"].run(
+            context
+            + '\n\n### SYSTEM PROMPT ###\n Your  task is to analyze the context and decide which agent to use. If you think the user needs help with the course, ask course_agent to give you a paragraph about a specific topic you will ask it about, and return it. If you think it would be good for the user to confirm their knowledge, ask question_agent to ask a question about the course. Return an answer after a single tool use, so that your returned answer is a dict of the form \'{"balise": agent_used_type (cours or question), "text": content_to_return}\'. To do so and not make a typo, write a python program that writes this dict. The returned answer might contain UTF-8, make sure to take this into account. If you don\'t want to return anything since the answers you are do not meet your quality standards, you may decide to return nothing, in this case, use the "nothing" balise. If an agent returns an answer you deem unwanted or unnecessary, or it does not meet your quality standards, you may decide to try again, ask another agent or, and it should sometimes be preferred, return nothing.'
+        )
         log("Manager answer:\n" + str(answer))
         # Returns a {"text":..., "balise":...}
         return answer
-  
-  def stringify_context(self, context: list[dict]) -> str:
-    return "\n".join([f"### {msg['role']} ###\n{msg['content']}\n" for msg in context])
+
+    def stringify_context(self, context: list[dict]) -> str:
+        return "\n".join(
+            [f"### {msg['role']} ###\n{msg['content']}\n" for msg in context]
+        )
+
 
 agent = Agent()
 models = dict()
+
 
 def init_agent(fixed_questions: list[dict]):
     """Initialize the agent with fixed questions from the questionnaire"""
@@ -150,52 +161,54 @@ def init_agent(fixed_questions: list[dict]):
 def run_agent(body: list[dict]) -> list[dict]:
     return agent.forward(body)
 
+
 class CourseWritingTool(Tool):
-   name = "course_writing_tool"
-   description = """This tool is responsible for explaining large concepts to the user. If the user seems stuck on some specific content, the course_writing_tool would be interesting to use to explain the user the concept he is lacking.  It is also used to answer the user's questions about the course, such as 'What is a Markov Chain?' or 'What is Young's double-slit experiment?'. The course_writing_tool is also used to explain the course step by step, and to answer the user's questions about the course."""
+    name = "course_writing_tool"
+    description = """This tool is responsible for explaining large concepts to the user. If the user seems stuck on some specific content, the course_writing_tool would be interesting to use to explain the user the concept he is lacking.  It is also used to answer the user's questions about the course, such as 'What is a Markov Chain?' or 'What is Young's double-slit experiment?'. The course_writing_tool is also used to explain the course step by step, and to answer the user's questions about the course."""
 
-   inputs = {
-      "context": {
-         "type": "string",
-         "description": "The context of the conversation, including the user's level of understanding, previous messages, and any relevant information the course_writing_tool could use. This context will be used to tailor the explanation to the user's needs.",
-      },
-      "topic": {
-         "type": "string",
-         "description": "The specific topic of the course to explain, as a single point to explain. For example, 'Transition matrices in Markov Chains' or 'The principle of Young's double-slit experiment'.",        
-      }
-   }
+    inputs = {
+        "context": {
+            "type": "string",
+            "description": "The context of the conversation, including the user's level of understanding, previous messages, and any relevant information the course_writing_tool could use. This context will be used to tailor the explanation to the user's needs.",
+        },
+        "topic": {
+            "type": "string",
+            "description": "The specific topic of the course to explain, as a single point to explain. For example, 'Transition matrices in Markov Chains' or 'The principle of Young's double-slit experiment'.",
+        },
+    }
 
-   output_type = "string"
+    output_type = "string"
 
-   def forward(self, context: str, topic: str) -> str:
-      prompt = """### SYSTEM PROMPT ###\nYou are a helpful agent that writes courses on various topics. You will be given a context of the conversation and a topic to explain. Your task is to write a course paragraph about the topic, using the context to tailor your explanation to the user's needs.\n\n### CONTEXT ###\n{context}\n\n### TOPIC ###\n{topic}\n\n### SYSTEM PROMPT ###\nDo NOT complain, do NOT ask for more information on your task, and do NOT answer as a chatbot. You should write answer a paragraph about a SINGLE topic. You should only use web search if you cannot come up with any course content by yourself or make sure you are right about a complex point, otherwise, you HAVE to return in a single run. If necessary, can think about a full course but should only teach about ONE SINGLE point of the course, as a single paragraph; as follow up points can be discussed later.\n\n### OUTPUT FORMAT ###\nReturn a single paragraph explaining the topic, using the context to tailor your explanation to the user's needs. Do not include any additional information or explanations, just the course content on a single topic.\n
+    def forward(self, context: str, topic: str) -> str:
+        prompt = """### SYSTEM PROMPT ###\nYou are a helpful agent that writes courses on various topics. You will be given a context of the conversation and a topic to explain. Your task is to write a course paragraph about the topic, using the context to tailor your explanation to the user's needs.\n\n### CONTEXT ###\n{context}\n\n### TOPIC ###\n{topic}\n\n### SYSTEM PROMPT ###\nDo NOT complain, do NOT ask for more information on your task, and do NOT answer as a chatbot. You should write answer a paragraph about a SINGLE topic. You should only use web search if you cannot come up with any course content by yourself or make sure you are right about a complex point, otherwise, you HAVE to return in a single run. If necessary, can think about a full course but should only teach about ONE SINGLE point of the course, as a single paragraph; as follow up points can be discussed later.\n\n### OUTPUT FORMAT ###\nReturn a single paragraph explaining the topic, using the context to tailor your explanation to the user's needs. Do not include any additional information or explanations, just the course content on a single topic.\n
       """.format(context=context, topic=topic)
-      return models["course"].run(prompt) 
-       
+        return models["course"].run(prompt)
+
+
 class QuestionWritingTool(Tool):
-   name = "question_writing_tool"
-   description = """This tool is responsible for asking questions to the user to verify the user's understanding of the course. When the user seems to have understood the course, the question_writing_tool will ask questions to verify the user's understanding. If the user seems to be stuck on some specific content, the question_writing_tool will ask questions to help the user understand the concept he is lacking. The question_writing_tool is also used to ask questions about the user's understanding of the course, such as 'Do you feel like you completely understand what a Markov Chain is?' or 'Do you know the principle behind Young's double-slit experiment?'. The question_writing_tool should only return a single question, and should not complain or ask for more information on its task."""
+    name = "question_writing_tool"
+    description = """This tool is responsible for asking questions to the user to verify the user's understanding of the course. When the user seems to have understood the course, the question_writing_tool will ask questions to verify the user's understanding. If the user seems to be stuck on some specific content, the question_writing_tool will ask questions to help the user understand the concept he is lacking. The question_writing_tool is also used to ask questions about the user's understanding of the course, such as 'Do you feel like you completely understand what a Markov Chain is?' or 'Do you know the principle behind Young's double-slit experiment?'. The question_writing_tool should only return a single question, and should not complain or ask for more information on its task."""
 
-   inputs = {
-      "context": {
-         "type": "string",
-         "description": "The context of the conversation, including the user's level of understanding, previous messages, and any relevant information the question_writing_tool could use. This context will be used to tailor the question to the user's needs.",
-         },
-      "topic": {
-         "type": "string",
-         "description": "The specific topic of the course to ask a question about, as a single point to ask about. For example, 'Transition matrices in Markov Chains' or 'The principle of Young's double-slit experiment'.",
-         }
-   }
+    inputs = {
+        "context": {
+            "type": "string",
+            "description": "The context of the conversation, including the user's level of understanding, previous messages, and any relevant information the question_writing_tool could use. This context will be used to tailor the question to the user's needs.",
+        },
+        "topic": {
+            "type": "string",
+            "description": "The specific topic of the course to ask a question about, as a single point to ask about. For example, 'Transition matrices in Markov Chains' or 'The principle of Young's double-slit experiment'.",
+        },
+    }
 
-   output_type = "string"
+    output_type = "string"
 
-   def forward(self, context: str, topic: str) -> str:
-      prompt = """### SYSTEM PROMPT ###\nYou are a helpful agent that writes questions on various topics. You will be given a context of the conversation and a topic to ask a question about. Your task is to write a question about the topic, using the context to tailor your question to the user's needs.\n\n### CONTEXT ###\n{context}\n\n### TOPIC ###\n{topic}\n\n### SYSTEM PROMPT ###\nDo NOT complain, do NOT ask for more information on your task, and do NOT answer as a chatbot. You should write a question about a SINGLE topic. You should only use web search if you cannot come up with any question by yourself or make sure you are right about a complex point, otherwise, you HAVE to return in a single run. If necessary, can think about a full course but should only ask ONE SINGLE question about the course, as a single point; as follow up points can be discussed later.\n\n### OUTPUT FORMAT ###\nReturn a single question asking about the topic, using the context to tailor your question to the user's needs. Do not include any additional information or explanations, just the question.\n
+    def forward(self, context: str, topic: str) -> str:
+        prompt = """### SYSTEM PROMPT ###\nYou are a helpful agent that writes questions on various topics. You will be given a context of the conversation and a topic to ask a question about. Your task is to write a question about the topic, using the context to tailor your question to the user's needs.\n\n### CONTEXT ###\n{context}\n\n### TOPIC ###\n{topic}\n\n### SYSTEM PROMPT ###\nDo NOT complain, do NOT ask for more information on your task, and do NOT answer as a chatbot. You should write a question about a SINGLE topic. You should only use web search if you cannot come up with any question by yourself or make sure you are right about a complex point, otherwise, you HAVE to return in a single run. If necessary, can think about a full course but should only ask ONE SINGLE question about the course, as a single point; as follow up points can be discussed later.\n\n### OUTPUT FORMAT ###\nReturn a single question asking about the topic, using the context to tailor your question to the user's needs. Do not include any additional information or explanations, just the question.\n
       """.format(context=context, topic=topic)
-      return models["question"].run(prompt)
+        return models["question"].run(prompt)
+
 
 def define_models(agent) -> dict:
-
     models["course"] = CodeAgent(
         model=LiteLLMModel(
             model_id=MEDIUM_LLM,
@@ -206,7 +219,6 @@ def define_models(agent) -> dict:
         tools=[WebSearchTool()],
         max_steps=3,
     )
-
 
     models["question"] = CodeAgent(
         model=LiteLLMModel(
@@ -243,7 +255,12 @@ def translate_json(body: list[dict]) -> list[dict]:
     # Gets dict, ordonned by keys and put into list
     translated = []
     for k in body:
-       translated.append({"balise": k["balise"] if k["balise"] != "default" else "user", "content": k["text"]})
+        translated.append(
+            {
+                "balise": k["balise"] if k["balise"] != "default" else "user",
+                "content": k["text"],
+            }
+        )
     return translated
 
 
@@ -253,7 +270,7 @@ def anthropify_body(body: list[dict]) -> list[dict]:
     """
     new_body = []
     if len(body) == 0:
-       return []
+        return []
     if body[0]["balise"] != "user":
         new_body = [
             {
