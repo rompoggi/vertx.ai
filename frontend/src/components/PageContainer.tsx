@@ -248,19 +248,43 @@ This environment allows you to:
 
   // Add new text block from API
   const addTextBlockFromAPI = (text: string, balise: string, color: string) => {
-    setTextBlocks(prevBlocks => [...prevBlocks, {
-      id: generateUniqueId(),
-      text,
-      mode: 'render',
-      balise,
-      color,
-    }]);
-    // Scroll to bottom after adding new block
-    setTimeout(() => {
-      if (textAreaContainerRef.current) {
-        textAreaContainerRef.current.scrollTop = textAreaContainerRef.current.scrollHeight;
-      }
-    }, 0);
+    setTextBlocks(prevBlocks => {
+      const newBlocks: TextBlock[] = [
+        ...prevBlocks, 
+        // Add the AI response block
+        {
+          id: generateUniqueId(),
+          text,
+          mode: 'render' as const,
+          balise,
+          color,
+        },
+        // Automatically add a new empty block for human response
+        {
+          id: generateUniqueId(),
+          text: '',
+          mode: 'edit' as const,
+          balise: 'human_response',
+          color: undefined,
+        }
+      ];
+      
+      // Focus on the new textarea after state update
+      setTimeout(() => {
+        const newIndex = newBlocks.length - 1;
+        const newTextArea = textAreaRefs.current[newIndex];
+        if (newTextArea) {
+          newTextArea.focus();
+        }
+        
+        // Also scroll to bottom
+        if (textAreaContainerRef.current) {
+          textAreaContainerRef.current.scrollTop = textAreaContainerRef.current.scrollHeight;
+        }
+      }, 100);
+      
+      return newBlocks;
+    });
   };
 
   // Handle API response based on balise type
@@ -273,10 +297,17 @@ This environment allows you to:
         addTextBlockFromAPI(response.text, response.balise, "rgba(255,0,0,0.15)");
         break;
       case 'question':
-        addTextBlockFromAPI(response.text, response.balise, "blue");
+        addTextBlockFromAPI(response.text, response.balise, "rgba(0,0,255,0.15)");
+        break;
+      case 'ai_response':
+        addTextBlockFromAPI(response.text, response.balise, "rgba(0,255,0,0.15)");
+        break;
+      case 'explanation':
+        addTextBlockFromAPI(response.text, response.balise, "rgba(255,165,0,0.15)");
         break;
       default:
-        console.warn(`Unknown balise type: ${response.balise}`);
+        // Default behavior: add as a general AI response
+        addTextBlockFromAPI(response.text, response.balise || 'ai_response', "rgba(255,210,70,0.15)");
         break;
     }
   };
