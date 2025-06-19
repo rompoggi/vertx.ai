@@ -18,8 +18,6 @@ import { faRocket } from '@fortawesome/free-solid-svg-icons';
 
 
 const App: React.FC = () => {
-  const [inputText, setInputText] = useState('');
-  const [processedText, setProcessedText] = useState('');
   const [error, setError] = useState('');
   const [name, setName] = useState('');
   const [educationLevels, setEducationLevels] = useState<string[]>([]);
@@ -397,18 +395,22 @@ const App: React.FC = () => {
             onFinalStepCompleted={() => {
               console.log("All steps completed!");
               submitQuestionnaireResults();
+              console.log("Questionnaire submitted successfully");
 
-              // Scroll to PageContainer after completing all steps
+              // Scroll to just above the ProgressBarSection
               setTimeout(() => {
-                const pageContainer = document.querySelector('#page-container');
-                if (pageContainer) {
-                  pageContainer.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+                const progressBarSection = document.querySelector('#progress-bar-section');
+                if (progressBarSection) {
+                  const rect = progressBarSection.getBoundingClientRect();
+                  const offsetTop = window.pageYOffset + rect.top - 100; // 100px above the progress bar
+                  
+                  window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
                   });
-                  console.log("Scrolled to PageContainer");
+                  console.log("Scrolled to position above ProgressBarSection");
                 } else {
-                  console.warn("PageContainer not found for scrolling");
+                  console.warn("ProgressBarSection not found for scrolling");
                 }
               }, 1000); // Delay to allow form submission to complete
             }}
@@ -553,7 +555,7 @@ const App: React.FC = () => {
                     items={availableTopics}
                     initialSelectedIndex={-1}
                     allowHtml={true}
-                    multiSelect={true}
+                    multiSelect={false}
                     onMultiSelect={(selectedItems, selectedIndices) => {
                       console.log('Selected topics:', selectedItems);
                       console.log('Selected topic indices:', selectedIndices);
@@ -561,6 +563,9 @@ const App: React.FC = () => {
                     }}
                     onItemSelect={(item, index) => {
                       console.log('Single selected topic:', item, 'at index:', index);
+                      // Replace the selected topics list with only the newly selected topic
+                      setSelectedTopics([item]);
+                      console.log('Updated selected topics to single item:', [item]);
                     }}
                   />
                   <div
@@ -606,12 +611,14 @@ const App: React.FC = () => {
 
           <div style={{ height: '40px' }} />
 
-          <DuolingoProgressBar
-            initialProgress={0}
-            onProgressChange={(progress) => {
-              console.log(`🎯 Progress updated: ${progress}%`);
-            }}
-          />
+          <div id="progress-bar-section">
+            <DuolingoProgressBar
+              initialProgress={0}
+              onProgressChange={(progress) => {
+                console.log(`🎯 Progress updated: ${progress}%`);
+              }}
+            />
+          </div>
 
           <PageContainer
             userName={name}

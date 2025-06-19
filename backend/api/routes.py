@@ -134,7 +134,7 @@ def initialize_agent_api():
         print("Fixed questions for agent:", fixed_questions)
 
         # Initialize the agent with the fixed questions
-        # init_agent(fixed_questions)
+        init_agent(fixed_questions)
 
         # Create a comprehensive response
         response_data = {

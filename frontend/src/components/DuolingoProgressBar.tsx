@@ -213,8 +213,8 @@ interface DuolingoProgressBarProps {
 const DuolingoProgressBar: React.FC<DuolingoProgressBarProps> = ({ 
   initialProgress = 0, 
   onProgressChange,
-  enableAutoDemo = true,
-  startDemo = true
+  enableAutoDemo = false,
+  startDemo = false
 }) => {
   const [progress, setProgress] = useState(initialProgress);
   const [isAnimating, setIsAnimating] = useState(true);
