@@ -4,7 +4,7 @@ from .context_building import build_context
 from os import path, getenv
 import dotenv
 
-
+USER_RESPONSE_BALISE = "human_response"
 DEBUG = True
 MEDIUM_LLM = "claude-sonnet-4-20250514"
 
@@ -257,7 +257,9 @@ def translate_json(body: list[dict]) -> list[dict]:
     for k in body:
         translated.append(
             {
-                "balise": k["balise"] if k["balise"] != "default" else "user",
+                "balise": k["balise"]
+                if k["balise"] != USER_RESPONSE_BALISE
+                else "user",
                 "content": k["text"],
             }
         )
@@ -271,13 +273,6 @@ def anthropify_body(body: list[dict]) -> list[dict]:
     new_body = []
     if len(body) == 0:
         return []
-    if body[0]["balise"] != "user":
-        new_body = [
-            {
-                "role": "user",
-                "content": "Hello, I am a user. I would like to work on something.",
-            }
-        ]
     for message in body:
         if message["balise"] == "user":
             if len(new_body) == 0 or new_body[-1]["role"] == "assistant":
